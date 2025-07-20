@@ -1,10 +1,26 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-next-app:*)",
-      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint --turbopack --force)",
-      "Bash(npm init:*)"
-    ],
-    "deny": []
-  }
+      "Bash(pnpm install:*)",
+      "Bash(pnpm build)",
+      "Bash(curl:*)",
+      "mcp__playwright__browser_navigate",
+      "Bash(pkill:*)",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_network_requests",
+      "Bash(pnpm add:*)",
+      "Bash(mkdir:*)",
+      "Bash(curl:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(rm:*)",
+      "Bash(rmdir:*)",
+      "Bash(true)",
+      "Bash(pnpm remove:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "playwright"
+  ]
 }
