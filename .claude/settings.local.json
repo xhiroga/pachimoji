@@ -16,7 +16,12 @@
       "Bash(rm:*)",
       "Bash(rmdir:*)",
       "Bash(true)",
-      "Bash(pnpm remove:*)"
+      "Bash(pnpm remove:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(node:*)",
+      "Bash(npx:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(lsof:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
