@@ -29,10 +29,16 @@ importers:
       three:
         specifier: ^0.178.0
         version: 0.178.0
+      troika-three-text:
+        specifier: ^0.52.4
+        version: 0.52.4(three@0.178.0)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
         version: 3.3.1
+      '@playwright/test':
+        specifier: ^1.54.1
+        version: 1.54.1
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.11
@@ -51,6 +57,9 @@ importers:
       eslint-config-next:
         specifier: 15.4.2
         version: 15.4.2(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
+      playwright:
+        specifier: ^1.54.1
+        version: 1.54.1
       tailwindcss:
         specifier: ^4
         version: 4.1.11
@@ -2353,7 +2362,6 @@ snapshots:
   '@playwright/test@1.54.1':
     dependencies:
       playwright: 1.54.1
-    optional: true
 
   '@react-three/drei@10.5.1(@react-three/fiber@9.2.0(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(three@0.178.0))(@types/react@19.1.8)(@types/three@0.178.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(three@0.178.0)':
     dependencies:
@@ -3817,15 +3825,13 @@ snapshots:
 
   picomatch@4.0.3: {}
 
-  playwright-core@1.54.1:
-    optional: true
+  playwright-core@1.54.1: {}
 
   playwright@1.54.1:
     dependencies:
       playwright-core: 1.54.1
     optionalDependencies:
       fsevents: 2.3.2
-    optional: true
 
   possible-typed-array-names@1.1.0: {}
 
