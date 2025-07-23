@@ -3,11 +3,22 @@
 import { useState, useCallback, memo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Text3D, Center, OrbitControls } from '@react-three/drei'
+import * as THREE from 'three'
 
 export default function Home() {
   const [text, setText] = useState('全国最大級')
   const [color, setColor] = useState('#ffffff')
+  const [bevelColor, setBevelColor] = useState('#ffaa00')
   const [selectedFont, setSelectedFont] = useState('/fonts/Noto Sans JP Black_Regular.json')
+  
+  // Material Effects
+  const [metalness, setMetalness] = useState(0.5)
+  const [roughness, setRoughness] = useState(0.1)
+  const [emissive, setEmissive] = useState('#000000')
+  const [emissiveIntensity, setEmissiveIntensity] = useState(0)
+  const [useGradient, setUseGradient] = useState(false)
+  const [gradientColor1, setGradientColor1] = useState('#ff0000')
+  const [gradientColor2, setGradientColor2] = useState('#00ff00')
   
   // Text3D Parameters
   const [size, setSize] = useState(1)
@@ -38,6 +49,7 @@ export default function Home() {
   const Text3DContent = memo(({
     text,
     color,
+    bevelColor,
     fontPath,
     size,
     height,
@@ -47,9 +59,17 @@ export default function Home() {
     bevelSize,
     bevelOffset,
     bevelSegments,
+    metalness,
+    roughness,
+    emissive,
+    emissiveIntensity,
+    useGradient,
+    gradientColor1,
+    gradientColor2,
   }: {
     text: string
     color: string
+    bevelColor: string
     fontPath: string
     size: number
     height: number
@@ -59,8 +79,20 @@ export default function Home() {
     bevelSize: number
     bevelOffset: number
     bevelSegments: number
+    metalness: number
+    roughness: number
+    emissive: string
+    emissiveIntensity: number
+    useGradient: boolean
+    gradientColor1: string
+    gradientColor2: string
   }) => {
     const sanitized = text.replace(/\n/g, ' ')
+    
+    // グラデーション色の計算（簡易版）
+    const finalColor = useGradient ? gradientColor1 : color
+    const finalBevelColor = useGradient ? gradientColor2 : bevelColor
+    
     return (
       <Center>
         <Text3D
@@ -75,7 +107,32 @@ export default function Home() {
           bevelSegments={bevelSegments}
         >
           {sanitized}
-          <meshStandardMaterial color={color} />
+          {/* Try JSX approach for multi-material */}
+          <meshStandardMaterial
+            attach={(parent) => {
+              // Create materials array and assign to parent
+              const frontMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(finalColor),
+                metalness: metalness,
+                roughness: roughness,
+                emissive: new THREE.Color(emissive),
+                emissiveIntensity: emissiveIntensity,
+              })
+              const sideMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(finalBevelColor),
+                metalness: metalness * 1.2,
+                roughness: roughness * 0.8,
+                emissive: new THREE.Color(emissive),
+                emissiveIntensity: emissiveIntensity * 0.5,
+              })
+              parent.material = [frontMaterial, sideMaterial]
+              return () => {
+                // Cleanup
+                frontMaterial.dispose()
+                sideMaterial.dispose()
+              }
+            }}
+          />
         </Text3D>
       </Center>
     )
@@ -101,6 +158,7 @@ export default function Home() {
               <Text3DContent
                 text={text}
                 color={color}
+                bevelColor={bevelColor}
                 fontPath={selectedFont}
                 size={size}
                 height={height}
@@ -110,6 +168,13 @@ export default function Home() {
                 bevelSize={bevelSize}
                 bevelOffset={bevelOffset}
                 bevelSegments={bevelSegments}
+                metalness={metalness}
+                roughness={roughness}
+                emissive={emissive}
+                emissiveIntensity={emissiveIntensity}
+                useGradient={useGradient}
+                gradientColor1={gradientColor1}
+                gradientColor2={gradientColor2}
               />
               <OrbitControls enablePan enableZoom enableRotate />
             </Canvas>
@@ -157,7 +222,7 @@ export default function Home() {
             
             <div>
               <label htmlFor="color-input" className="block mb-2 text-sm font-medium">
-                Color / 色
+                Face Color / 表面色
               </label>
               <input
                 id="color-input"
@@ -166,6 +231,124 @@ export default function Home() {
                 onChange={(e) => setColor(e.target.value)}
                 className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
               />
+            </div>
+            
+            <div>
+              <label htmlFor="bevel-color-input" className="block mb-2 text-sm font-medium">
+                Bevel Color / ベベル色
+              </label>
+              <input
+                id="bevel-color-input"
+                type="color"
+                value={bevelColor}
+                onChange={(e) => setBevelColor(e.target.value)}
+                className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
+              />
+            </div>
+            
+            {/* Material Effects */}
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">Material Effects / マテリアル効果</h3>
+              
+              <div>
+                <label className="block mb-1 text-sm">
+                  Metalness / メタリック: {metalness.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={metalness}
+                  onChange={(e) => setMetalness(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Roughness / 粗さ: {roughness.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={roughness}
+                  onChange={(e) => setRoughness(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="emissive-color" className="block mb-2 text-sm">
+                  Emissive Color / 発光色
+                </label>
+                <input
+                  id="emissive-color"
+                  type="color"
+                  value={emissive}
+                  onChange={(e) => setEmissive(e.target.value)}
+                  className="w-full h-8 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Emissive Intensity / 発光強度: {emissiveIntensity.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="2"
+                  step="0.01"
+                  value={emissiveIntensity}
+                  onChange={(e) => setEmissiveIntensity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="flex items-center space-x-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={useGradient}
+                    onChange={(e) => setUseGradient(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span>Use Gradient / グラデーション使用</span>
+                </label>
+              </div>
+
+              {useGradient && (
+                <>
+                  <div>
+                    <label htmlFor="gradient-color1" className="block mb-2 text-sm">
+                      Gradient Color 1 / グラデーション色1
+                    </label>
+                    <input
+                      id="gradient-color1"
+                      type="color"
+                      value={gradientColor1}
+                      onChange={(e) => setGradientColor1(e.target.value)}
+                      className="w-full h-8 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="gradient-color2" className="block mb-2 text-sm">
+                      Gradient Color 2 / グラデーション色2
+                    </label>
+                    <input
+                      id="gradient-color2"
+                      type="color"
+                      value={gradientColor2}
+                      onChange={(e) => setGradientColor2(e.target.value)}
+                      className="w-full h-8 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                    />
+                  </div>
+                </>
+              )}
             </div>
             
             {/* Text3D Parameters */}
