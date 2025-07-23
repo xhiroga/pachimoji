@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useCallback, memo } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { Text3D, Center, OrbitControls } from '@react-three/drei'
+import { Canvas, useThree } from '@react-three/fiber'
+import { Text3D, Center, OrbitControls, TransformControls } from '@react-three/drei'
 import * as THREE from 'three'
+import { useRef } from 'react'
 
 export default function Home() {
   const [text, setText] = useState('全国最大級')
@@ -16,6 +17,17 @@ export default function Home() {
   const [roughness, setRoughness] = useState(0.1)
   const [emissive, setEmissive] = useState('#000000')
   const [emissiveIntensity, setEmissiveIntensity] = useState(0)
+  
+  // Lighting Controls
+  const [ambientIntensity, setAmbientIntensity] = useState(0.3)
+  const [mainLightIntensity, setMainLightIntensity] = useState(2.0)
+  const [sideLightIntensity, setSideLightIntensity] = useState(1.5)
+  const [spotLightIntensity, setSpotLightIntensity] = useState(3.0)
+  const [pointLightIntensity, setPointLightIntensity] = useState(1.2)
+  
+  // Interactive Light Controls
+  const [interactiveLightIntensity, setInteractiveLightIntensity] = useState(2.5)
+  const [showLightHelper, setShowLightHelper] = useState(true)
   
   // Text3D Parameters
   const [size, setSize] = useState(1)
@@ -127,6 +139,45 @@ export default function Home() {
 
   Text3DContent.displayName = 'Text3DContent'
 
+  // インタラクティブライトコンポーネント
+  const InteractiveLight = memo(({ intensity, showHelper }: { intensity: number, showHelper: boolean }) => {
+    const lightRef = useRef<THREE.DirectionalLight>(null)
+    const helperRef = useRef<THREE.Mesh>(null)
+
+    return (
+      <group>
+        {/* インタラクティブな方向ライト */}
+        <directionalLight
+          ref={lightRef}
+          position={[0, 3, 3]} // 文字の正面やや上
+          intensity={intensity}
+          color="#ffffff"
+          castShadow
+        />
+        
+        {showHelper && lightRef.current && (
+          <>
+            <TransformControls
+              object={lightRef.current}
+              mode="translate"
+              showX={true}
+              showY={true}
+              showZ={true}
+              size={0.5}
+            />
+            {/* ライトの位置を示すビジュアルヘルパー */}
+            <mesh ref={helperRef} position={[0, 3, 3]}>
+              <sphereGeometry args={[0.15, 16, 16]} />
+              <meshBasicMaterial color="#ffff00" transparent opacity={0.8} />
+            </mesh>
+          </>
+        )}
+      </group>
+    )
+  })
+
+  InteractiveLight.displayName = 'InteractiveLight'
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <div className="container mx-auto p-8">
@@ -140,32 +191,36 @@ export default function Home() {
               style={{ width: '100%', height: '100%' }}
             >
               {/* パチンコ店風ド派手ライティング召喚 */}
-              <ambientLight intensity={0.3} color="#ffffff" />
+              <ambientLight intensity={ambientIntensity} color="#ffffff" />
               
               {/* メインライト（正面上から） */}
-              <directionalLight position={[0, 10, 5]} intensity={2.0} color="#ffffff" castShadow />
+              <directionalLight position={[0, 10, 5]} intensity={mainLightIntensity} color="#ffffff" castShadow />
               
               {/* サイドライト（左右から） */}
-              <directionalLight position={[10, 5, 3]} intensity={1.5} color="#ffff99" />
-              <directionalLight position={[-10, 5, 3]} intensity={1.5} color="#ffff99" />
+              <directionalLight position={[10, 5, 3]} intensity={sideLightIntensity} color="#ffff99" />
+              <directionalLight position={[-10, 5, 3]} intensity={sideLightIntensity} color="#ffff99" />
               
               {/* バックライト（後ろから） */}
-              <directionalLight position={[0, 2, -5]} intensity={0.8} color="#ffffcc" />
+              <directionalLight position={[0, 2, -5]} intensity={sideLightIntensity * 0.5} color="#ffffcc" />
               
               {/* スポットライト（上から集中照射） */}
               <spotLight
                 position={[0, 15, 0]}
                 angle={Math.PI / 6}
                 penumbra={0.3}
-                intensity={3.0}
+                intensity={spotLightIntensity}
                 color="#ffffff"
                 castShadow
               />
               
               {/* ポイントライト（キラキラ効果用） */}
-              <pointLight position={[5, 5, 5]} intensity={1.2} color="#ffdd44" />
-              <pointLight position={[-5, 5, 5]} intensity={1.2} color="#ffdd44" />
-              <pointLight position={[0, -3, 8]} intensity={0.8} color="#ffffaa" />
+              <pointLight position={[5, 5, 5]} intensity={pointLightIntensity} color="#ffdd44" />
+              <pointLight position={[-5, 5, 5]} intensity={pointLightIntensity} color="#ffdd44" />
+              <pointLight position={[0, -3, 8]} intensity={pointLightIntensity * 0.7} color="#ffffaa" />
+              
+              {/* インタラクティブライト */}
+              <InteractiveLight intensity={interactiveLightIntensity} showHelper={showLightHelper} />
+              
               <Text3DContent
                 text={text}
                 color={color}
@@ -316,6 +371,113 @@ export default function Home() {
                 />
               </div>
 
+            </div>
+            
+            {/* Lighting Controls */}
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">Lighting Controls / ライティング制御</h3>
+              
+              <div>
+                <label className="block mb-1 text-sm">
+                  Ambient Light / 環境光: {ambientIntensity.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="2"
+                  step="0.1"
+                  value={ambientIntensity}
+                  onChange={(e) => setAmbientIntensity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Main Light / メインライト: {mainLightIntensity.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={mainLightIntensity}
+                  onChange={(e) => setMainLightIntensity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Side Light / サイドライト: {sideLightIntensity.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="3"
+                  step="0.1"
+                  value={sideLightIntensity}
+                  onChange={(e) => setSideLightIntensity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Spot Light / スポットライト: {spotLightIntensity.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={spotLightIntensity}
+                  onChange={(e) => setSpotLightIntensity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Point Light / ポイントライト: {pointLightIntensity.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="3"
+                  step="0.1"
+                  value={pointLightIntensity}
+                  onChange={(e) => setPointLightIntensity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Interactive Light / 操作可能ライト: {interactiveLightIntensity.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={interactiveLightIntensity}
+                  onChange={(e) => setInteractiveLightIntensity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="flex items-center space-x-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={showLightHelper}
+                    onChange={(e) => setShowLightHelper(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span>Show Light Handle / ライトハンドル表示</span>
+                </label>
+              </div>
             </div>
             
             {/* Text3D Parameters */}
