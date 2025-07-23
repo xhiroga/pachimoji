@@ -1,34 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 
 const Text3D = dynamic(() => import('@/components/Text3D'), { ssr: false })
 
 export default function Home() {
-  const [text, setText] = useState('hi')
+  const [text, setText] = useState('全国最大級')
   const [color, setColor] = useState('#ffffff')
-  const [selectedFont, setSelectedFont] = useState('/fonts/helvetiker_regular.typeface.json')
+  const [selectedFont, setSelectedFont] = useState('/fonts/Noto Sans JP Black_Regular.json')
   const [outlineWidth, setOutlineWidth] = useState(0.05)
   const [outlineColor, setOutlineColor] = useState('#000000')
 
   const fonts = [
-    { name: 'Helvetiker (標準)', path: '/fonts/helvetiker_regular.typeface.json' },
-    // { name: 'Noto Sans JP ExtraBold (ローカル JSON)', path: '/fonts/Noto_Sans_JP_ExtraBold_Regular.json' },
     { name: 'Noto Sans JP (日本語)', path: '/fonts/Noto Sans JP Black_Regular.json' },
-    { name: 'Roboto', path: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2' },
-    { name: 'Open Sans', path: 'https://fonts.gstatic.com/s/opensans/v40/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4gaVI.woff2' },
-    { name: 'Montserrat', path: 'https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459Wlhyw.woff2' },
-    { name: 'Poppins', path: 'https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2' },
+    { name: 'Helvetiker (標準)', path: '/fonts/helvetiker_regular.typeface.json' },
   ]
 
+  // Canvas を PNG としてダウンロード
+  const handleDownload = useCallback(() => {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement | null
+    if (!canvas) return
+    const link = document.createElement('a')
+    link.download = '3dtext.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }, [])
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="container mx-auto p-8">
         <h1 className="text-4xl font-bold mb-8 text-center">3D Text Editor</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 h-[600px] bg-gray-800 rounded-lg overflow-hidden">
+          <div className="lg:col-span-2 h-[600px] bg-white rounded-lg overflow-hidden border border-gray-200">
             <Text3D 
               text={text} 
               color={color} 
@@ -39,18 +44,17 @@ export default function Home() {
           </div>
           
           <div className="space-y-6">
-            <div>
+            <div className="flex items-center justify-between">
               <label htmlFor="text-input" className="block mb-2 text-sm font-medium">
                 Text / テキスト
               </label>
-              <input
-                id="text-input"
-                type="text"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500"
-                placeholder="Enter your text"
-              />
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                PNG ダウンロード
+              </button>
             </div>
             
             <div>
@@ -61,7 +65,7 @@ export default function Home() {
                 id="font-select"
                 value={selectedFont}
                 onChange={(e) => setSelectedFont(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-900"
               >
                 {fonts.map((font) => (
                   <option key={font.path} value={font.path}>
@@ -80,7 +84,7 @@ export default function Home() {
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                className="w-full h-10 bg-gray-800 border border-gray-700 rounded-lg cursor-pointer"
+                className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
               />
             </div>
             
@@ -110,7 +114,7 @@ export default function Home() {
                 type="color"
                 value={outlineColor}
                 onChange={(e) => setOutlineColor(e.target.value)}
-                className="w-full h-10 bg-gray-800 border border-gray-700 rounded-lg cursor-pointer"
+                className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
               />
             </div>
           </div>

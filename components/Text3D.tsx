@@ -55,6 +55,8 @@ export default function Text3DComponent({
   return (
     <div className="w-full h-full">
       <Canvas camera={{ position: [0, 0, 5] }}>
+        {/* 背景色を白に設定 */}
+        <color attach="background" args={["#ffffff"]} />
         {/* 全体を明るくするためにライト構成を強化 */}
         <ambientLight intensity={1} />
         {/* キーライト */}
