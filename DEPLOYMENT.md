@@ -32,7 +32,7 @@ pnpm run build
 **Build Configuration:**
 - **Framework preset**: Next.js (Static HTML Export)
 - **Build command**: `pnpm run build`
-- **Build output directory**: `out`
+- **Build output directory**: `dist`
 - **Root directory**: `/`
 
 **Environment Variables:**
@@ -75,8 +75,8 @@ git push origin main
 # ローカルでビルドテスト
 pnpm run build
 
-# outディレクトリの確認
-ls -la out/
+# distディレクトリの確認
+ls -la dist/
 ```
 
 ### フォント読み込みエラー
