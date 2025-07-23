@@ -1,0 +1,7 @@
+{
+  "name": "3d-text-worker",
+  "compatibility_date": "2025-07-23",
+  "assets": {
+    "directory": "./dist"
+  }
+}
