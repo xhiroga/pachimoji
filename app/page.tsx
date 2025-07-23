@@ -2,7 +2,7 @@
 
 import { useState, useCallback, memo } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { Text3D, Center, OrbitControls } from '@react-three/drei'
+import { Text3D, Center, OrbitControls, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 
 export default function Home() {
@@ -16,6 +16,7 @@ export default function Home() {
   const [roughness, setRoughness] = useState(0.6)
   const [emissive, setEmissive] = useState('#ffffff')
   const [emissiveIntensity, setEmissiveIntensity] = useState(0)
+  const [selectedTexture, setSelectedTexture] = useState('none')
   
   // Lighting Controls
   const [ambientIntensity, setAmbientIntensity] = useState(1.0)
@@ -35,6 +36,12 @@ export default function Home() {
   const fonts = [
     { name: 'Noto Sans JP (日本語)', path: '/fonts/Noto Sans JP Black_Regular.json' },
     { name: 'Helvetiker (標準)', path: '/fonts/helvetiker_regular.typeface.json' },
+  ]
+
+  const textures = [
+    { name: 'None / なし', value: 'none', path: null },
+    { name: 'Metal Plate / メタルプレート', value: 'metal', path: '/textures/metal_plate_diff_1k.jpg' },
+    { name: 'Metal Gloss / 金属光沢', value: 'gloss', path: '/textures/pierre-bamin-_EzTds6Fo44-unsplash.jpg' },
   ]
 
   // Canvas を PNG としてダウンロード
@@ -65,6 +72,7 @@ export default function Home() {
     roughness,
     emissive,
     emissiveIntensity,
+    selectedTexture,
   }: {
     text: string
     color: string
@@ -82,8 +90,32 @@ export default function Home() {
     roughness: number
     emissive: string
     emissiveIntensity: number
+    selectedTexture: string
   }) => {
     const sanitized = text.replace(/\n/g, ' ')
+    
+    // テクスチャの読み込み（全テクスチャを事前に読み込み）
+    const selectedTextureInfo = textures.find(t => t.value === selectedTexture)
+    const texturePaths = [
+      '/textures/metal_plate_diff_1k.jpg',
+      '/textures/pierre-bamin-_EzTds6Fo44-unsplash.jpg'
+    ]
+    
+    // 常に全テクスチャを読み込み（条件なし）
+    const textureArray = useTexture(texturePaths)
+    const loadedTextures: { [key: string]: THREE.Texture } = {}
+    
+    texturePaths.forEach((path, index) => {
+      const tex = Array.isArray(textureArray) ? textureArray[index] : textureArray
+      if (tex) {
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping
+        tex.repeat.set(2, 2)
+        loadedTextures[path] = tex
+      }
+    })
+    
+    // 選択されたテクスチャを取得
+    const texture = selectedTextureInfo?.path ? loadedTextures[selectedTextureInfo.path] : null
     
     return (
       <Center>
@@ -109,6 +141,7 @@ export default function Home() {
                 roughness: roughness,
                 emissive: new THREE.Color(emissive),
                 emissiveIntensity: emissiveIntensity,
+                map: texture, // テクスチャを適用
               })
               const sideMaterial = new THREE.MeshStandardMaterial({
                 color: new THREE.Color(bevelColor),
@@ -171,6 +204,7 @@ export default function Home() {
                 roughness={roughness}
                 emissive={emissive}
                 emissiveIntensity={emissiveIntensity}
+                selectedTexture={selectedTexture}
               />
               <OrbitControls enablePan={false} enableZoom enableRotate />
             </Canvas>
@@ -302,6 +336,24 @@ export default function Home() {
                   onChange={(e) => setEmissiveIntensity(parseFloat(e.target.value))}
                   className="w-full"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="texture-select" className="block mb-2 text-sm font-medium">
+                  Texture / テクスチャ
+                </label>
+                <select
+                  id="texture-select"
+                  value={selectedTexture}
+                  onChange={(e) => setSelectedTexture(e.target.value)}
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-900"
+                >
+                  {textures.map((texture) => (
+                    <option key={texture.value} value={texture.value}>
+                      {texture.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
             </div>
@@ -506,7 +558,8 @@ export default function Home() {
                   bevelThickness,
                   bevelSize,
                   bevelOffset,
-                  bevelSegments
+                  bevelSegments,
+                  selectedTexture
                 }, null, 2)}
                 onChange={(e) => {
                   try {
@@ -532,6 +585,7 @@ export default function Home() {
                     if (settings.bevelSize !== undefined) setBevelSize(settings.bevelSize)
                     if (settings.bevelOffset !== undefined) setBevelOffset(settings.bevelOffset)
                     if (settings.bevelSegments !== undefined) setBevelSegments(settings.bevelSegments)
+                    if (settings.selectedTexture !== undefined) setSelectedTexture(settings.selectedTexture)
                   } catch (error) {
                     // Invalid JSON - ignore
                   }
