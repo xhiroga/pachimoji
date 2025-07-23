@@ -54,7 +54,7 @@ export default function Text3DComponent({
 }: Text3DProps) {
   return (
     <div className="w-full h-full">
-      <Canvas camera={{ position: [0, 0, 5] }}>
+      <Canvas camera={{ position: [0, 0, 5] }} gl={{ preserveDrawingBuffer: true, antialias: true, alpha: false }}>
         {/* 背景色を白に設定 */}
         <color attach="background" args={["#ffffff"]} />
         {/* 全体を明るくするためにライト構成を強化 */}
