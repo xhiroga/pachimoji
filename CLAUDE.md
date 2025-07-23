@@ -11,7 +11,7 @@
 - Verify all UI controls work as expected
 - Take screenshots in screenshots/ folder during testing to visually confirm functionality
 - Always visually verify Japanese text is properly displayed
-- Start dev server with: `pnpm dev &>/dev/null &` to avoid blocking
+- Start dev server with: `pnpm dev &>/dev/null &` to avoid blocking (標準出力を読み捨てないとTaskツールが途中で停止する)
 
 ## Last Testing Results (3D Text Rendering Fixed)
 ✅ All tests passed:
