@@ -6,16 +6,18 @@ import dynamic from 'next/dynamic'
 const Text3D = dynamic(() => import('@/components/Text3D'), { ssr: false })
 
 export default function Home() {
-  const [text, setText] = useState('3D Text')
+  const [text, setText] = useState('こんにちは')
   const [color, setColor] = useState('#ffffff')
-  const [selectedFont, setSelectedFont] = useState('/fonts/helvetiker_regular.typeface.json')
+  const [selectedFont, setSelectedFont] = useState('https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEi75vY0rw-oME.woff')
+  const [outlineWidth, setOutlineWidth] = useState(0.05)
+  const [outlineColor, setOutlineColor] = useState('#000000')
 
   const fonts = [
-    { name: 'Helvetiker Regular', path: '/fonts/helvetiker_regular.typeface.json' },
-    { name: 'Helvetiker Bold', path: '/fonts/helvetiker_bold.typeface.json' },
-    { name: 'Optimer Regular', path: '/fonts/optimer_regular.typeface.json' },
-    { name: 'Optimer Bold', path: '/fonts/optimer_bold.typeface.json' },
     { name: 'Noto Sans JP (日本語)', path: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEi75vY0rw-oME.woff' },
+    { name: 'Roboto', path: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2' },
+    { name: 'Open Sans', path: 'https://fonts.gstatic.com/s/opensans/v40/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4gaVI.woff2' },
+    { name: 'Montserrat', path: 'https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459Wlhyw.woff2' },
+    { name: 'Poppins', path: 'https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2' },
   ]
 
   return (
@@ -25,7 +27,13 @@ export default function Home() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 h-[600px] bg-gray-800 rounded-lg overflow-hidden">
-            <Text3D text={text} color={color} font={selectedFont} />
+            <Text3D 
+              text={text} 
+              color={color} 
+              font={selectedFont}
+              outlineWidth={outlineWidth}
+              outlineColor={outlineColor}
+            />
           </div>
           
           <div className="space-y-6">
@@ -70,6 +78,36 @@ export default function Home() {
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
+                className="w-full h-10 bg-gray-800 border border-gray-700 rounded-lg cursor-pointer"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="outline-width" className="block mb-2 text-sm font-medium">
+                Outline Width / 縁取り幅
+              </label>
+              <input
+                id="outline-width"
+                type="range"
+                min="0"
+                max="0.2"
+                step="0.01"
+                value={outlineWidth}
+                onChange={(e) => setOutlineWidth(parseFloat(e.target.value))}
+                className="w-full"
+              />
+              <span className="text-xs text-gray-400">{outlineWidth.toFixed(2)}</span>
+            </div>
+            
+            <div>
+              <label htmlFor="outline-color" className="block mb-2 text-sm font-medium">
+                Outline Color / 縁取り色
+              </label>
+              <input
+                id="outline-color"
+                type="color"
+                value={outlineColor}
+                onChange={(e) => setOutlineColor(e.target.value)}
                 className="w-full h-10 bg-gray-800 border border-gray-700 rounded-lg cursor-pointer"
               />
             </div>

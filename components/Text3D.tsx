@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { Text3D, Center, OrbitControls } from '@react-three/drei'
+import { Text, Center, OrbitControls } from '@react-three/drei'
 import { Suspense } from 'react'
 
 interface Text3DProps {
@@ -9,33 +9,48 @@ interface Text3DProps {
   color?: string
   size?: number
   font?: string
+  outlineWidth?: number
+  outlineColor?: string
 }
 
-function TextContent({ text, color = "#ffffff", size = 1, font }: Text3DProps) {
-  // For now, use only the working fonts to ensure 3D text renders
-  const workingFont = font?.endsWith('.json') ? font : '/fonts/helvetiker_regular.typeface.json'
-
+function TextContent({ 
+  text, 
+  color = "#ffffff", 
+  size = 1, 
+  font,
+  outlineWidth = 0.05,
+  outlineColor = "#000000"
+}: Text3DProps) {
   return (
     <Center>
-      <Text3D
-        font={workingFont}
-        size={size}
-        height={0.2}
-        curveSegments={12}
-        bevelEnabled
-        bevelThickness={0.02}
-        bevelSize={0.02}
-        bevelOffset={0}
-        bevelSegments={5}
+      <Text
+        font={font}
+        fontSize={size}
+        color={color}
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={outlineWidth}
+        outlineColor={outlineColor}
+        maxWidth={20}
+        lineHeight={1}
+        letterSpacing={0.02}
+        textAlign="center"
       >
         {text}
-        <meshStandardMaterial color={color} />
-      </Text3D>
+        <meshStandardMaterial />
+      </Text>
     </Center>
   )
 }
 
-export default function Text3DComponent({ text = "3D Text", color = "#ffffff", size = 1, font = "/fonts/helvetiker_regular.typeface.json" }: Text3DProps) {
+export default function Text3DComponent({ 
+  text = "3D Text", 
+  color = "#ffffff", 
+  size = 1, 
+  font,
+  outlineWidth = 0.05,
+  outlineColor = "#000000"
+}: Text3DProps) {
   return (
     <div className="w-full h-full">
       <Canvas camera={{ position: [0, 0, 5] }}>
@@ -43,7 +58,14 @@ export default function Text3DComponent({ text = "3D Text", color = "#ffffff", s
         <pointLight position={[10, 10, 10]} />
         <pointLight position={[-10, -10, -10]} intensity={0.3} />
         <Suspense fallback={null}>
-          <TextContent text={text} color={color} size={size} font={font} />
+          <TextContent 
+            text={text} 
+            color={color} 
+            size={size} 
+            font={font}
+            outlineWidth={outlineWidth}
+            outlineColor={outlineColor}
+          />
           <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
         </Suspense>
       </Canvas>
