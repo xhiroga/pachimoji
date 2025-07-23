@@ -7,8 +7,8 @@ import * as THREE from 'three'
 
 export default function Home() {
   const [text, setText] = useState('全国最大級')
-  const [color, setColor] = useState('#ffffff')
-  const [bevelColor, setBevelColor] = useState('#ffaa00')
+  const [color, setColor] = useState('#FFD700') // ゴールド色
+  const [bevelColor, setBevelColor] = useState('#8B4513') // 茶色
   const [selectedFont, setSelectedFont] = useState('/fonts/Noto Sans JP Black_Regular.json')
   
   // Material Effects
@@ -16,17 +16,14 @@ export default function Home() {
   const [roughness, setRoughness] = useState(0.1)
   const [emissive, setEmissive] = useState('#000000')
   const [emissiveIntensity, setEmissiveIntensity] = useState(0)
-  const [useGradient, setUseGradient] = useState(false)
-  const [gradientColor1, setGradientColor1] = useState('#ff0000')
-  const [gradientColor2, setGradientColor2] = useState('#00ff00')
   
   // Text3D Parameters
   const [size, setSize] = useState(1)
-  const [height, setHeight] = useState(0.2)
+  const [height, setHeight] = useState(1) // デフォルト1に変更
   const [curveSegments, setCurveSegments] = useState(12)
   const [bevelEnabled, setBevelEnabled] = useState(true)
   const [bevelThickness, setBevelThickness] = useState(0.02)
-  const [bevelSize, setBevelSize] = useState(0.02)
+  const [bevelSize, setBevelSize] = useState(0.1) // デフォルト0.1に変更
   const [bevelOffset, setBevelOffset] = useState(0)
   const [bevelSegments, setBevelSegments] = useState(3)
 
@@ -63,9 +60,6 @@ export default function Home() {
     roughness,
     emissive,
     emissiveIntensity,
-    useGradient,
-    gradientColor1,
-    gradientColor2,
   }: {
     text: string
     color: string
@@ -83,15 +77,8 @@ export default function Home() {
     roughness: number
     emissive: string
     emissiveIntensity: number
-    useGradient: boolean
-    gradientColor1: string
-    gradientColor2: string
   }) => {
     const sanitized = text.replace(/\n/g, ' ')
-    
-    // グラデーション色の計算（簡易版）
-    const finalColor = useGradient ? gradientColor1 : color
-    const finalBevelColor = useGradient ? gradientColor2 : bevelColor
     
     return (
       <Center>
@@ -112,14 +99,14 @@ export default function Home() {
             attach={(parent) => {
               // Create materials array and assign to parent
               const frontMaterial = new THREE.MeshStandardMaterial({
-                color: new THREE.Color(finalColor),
+                color: new THREE.Color(color),
                 metalness: metalness,
                 roughness: roughness,
                 emissive: new THREE.Color(emissive),
                 emissiveIntensity: emissiveIntensity,
               })
               const sideMaterial = new THREE.MeshStandardMaterial({
-                color: new THREE.Color(finalBevelColor),
+                color: new THREE.Color(bevelColor),
                 metalness: metalness * 1.2,
                 roughness: roughness * 0.8,
                 emissive: new THREE.Color(emissive),
@@ -152,9 +139,33 @@ export default function Home() {
               gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
               style={{ width: '100%', height: '100%' }}
             >
-              <ambientLight intensity={1} />
-              <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
-              <directionalLight position={[-5, -5, 5]} intensity={0.6} />
+              {/* パチンコ店風ド派手ライティング召喚 */}
+              <ambientLight intensity={0.3} color="#ffffff" />
+              
+              {/* メインライト（正面上から） */}
+              <directionalLight position={[0, 10, 5]} intensity={2.0} color="#ffffff" castShadow />
+              
+              {/* サイドライト（左右から） */}
+              <directionalLight position={[10, 5, 3]} intensity={1.5} color="#ffff99" />
+              <directionalLight position={[-10, 5, 3]} intensity={1.5} color="#ffff99" />
+              
+              {/* バックライト（後ろから） */}
+              <directionalLight position={[0, 2, -5]} intensity={0.8} color="#ffffcc" />
+              
+              {/* スポットライト（上から集中照射） */}
+              <spotLight
+                position={[0, 15, 0]}
+                angle={Math.PI / 6}
+                penumbra={0.3}
+                intensity={3.0}
+                color="#ffffff"
+                castShadow
+              />
+              
+              {/* ポイントライト（キラキラ効果用） */}
+              <pointLight position={[5, 5, 5]} intensity={1.2} color="#ffdd44" />
+              <pointLight position={[-5, 5, 5]} intensity={1.2} color="#ffdd44" />
+              <pointLight position={[0, -3, 8]} intensity={0.8} color="#ffffaa" />
               <Text3DContent
                 text={text}
                 color={color}
@@ -172,9 +183,6 @@ export default function Home() {
                 roughness={roughness}
                 emissive={emissive}
                 emissiveIntensity={emissiveIntensity}
-                useGradient={useGradient}
-                gradientColor1={gradientColor1}
-                gradientColor2={gradientColor2}
               />
               <OrbitControls enablePan enableZoom enableRotate />
             </Canvas>
@@ -308,47 +316,6 @@ export default function Home() {
                 />
               </div>
 
-              <div>
-                <label className="flex items-center space-x-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={useGradient}
-                    onChange={(e) => setUseGradient(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <span>Use Gradient / グラデーション使用</span>
-                </label>
-              </div>
-
-              {useGradient && (
-                <>
-                  <div>
-                    <label htmlFor="gradient-color1" className="block mb-2 text-sm">
-                      Gradient Color 1 / グラデーション色1
-                    </label>
-                    <input
-                      id="gradient-color1"
-                      type="color"
-                      value={gradientColor1}
-                      onChange={(e) => setGradientColor1(e.target.value)}
-                      className="w-full h-8 bg-white border border-gray-300 rounded-lg cursor-pointer"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="gradient-color2" className="block mb-2 text-sm">
-                      Gradient Color 2 / グラデーション色2
-                    </label>
-                    <input
-                      id="gradient-color2"
-                      type="color"
-                      value={gradientColor2}
-                      onChange={(e) => setGradientColor2(e.target.value)}
-                      className="w-full h-8 bg-white border border-gray-300 rounded-lg cursor-pointer"
-                    />
-                  </div>
-                </>
-              )}
             </div>
             
             {/* Text3D Parameters */}
@@ -377,8 +344,8 @@ export default function Home() {
                 <input
                   type="range"
                   min="0"
-                  max="1"
-                  step="0.01"
+                  max="10"
+                  step="0.1"
                   value={height}
                   onChange={(e) => setHeight(parseFloat(e.target.value))}
                   className="w-full"
@@ -431,13 +398,13 @@ export default function Home() {
 
                   <div>
                     <label className="block mb-1 text-sm">
-                      Bevel Size / ベベルサイズ: {bevelSize.toFixed(3)}
+                      Bevel Size / ベベルサイズ: {bevelSize.toFixed(2)}
                     </label>
                     <input
                       type="range"
                       min="0"
-                      max="0.1"
-                      step="0.001"
+                      max="1"
+                      step="0.01"
                       value={bevelSize}
                       onChange={(e) => setBevelSize(parseFloat(e.target.value))}
                       className="w-full"
