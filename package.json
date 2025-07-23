@@ -8,7 +8,7 @@
     "export": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "next build && echo 'Static files generated in ./out directory'"
+    "deploy": "next build && echo 'Static files generated in ./dist directory'"
   },
   "dependencies": {
     "@react-three/drei": "^10.5.1",
