@@ -455,8 +455,8 @@ export default function Home() {
                     </label>
                     <input
                       type="range"
-                      min="0"
-                      max="0.05"
+                      min="-0.1"
+                      max="0.1"
                       step="0.001"
                       value={bevelOffset}
                       onChange={(e) => setBevelOffset(parseFloat(e.target.value))}
