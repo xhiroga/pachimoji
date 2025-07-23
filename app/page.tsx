@@ -8,8 +8,16 @@ export default function Home() {
   const [text, setText] = useState('全国最大級')
   const [color, setColor] = useState('#ffffff')
   const [selectedFont, setSelectedFont] = useState('/fonts/Noto Sans JP Black_Regular.json')
-  const [outlineWidth, setOutlineWidth] = useState(0.05)
-  const [outlineColor, setOutlineColor] = useState('#000000')
+  
+  // Text3D Parameters
+  const [size, setSize] = useState(1)
+  const [height, setHeight] = useState(0.2)
+  const [curveSegments, setCurveSegments] = useState(12)
+  const [bevelEnabled, setBevelEnabled] = useState(true)
+  const [bevelThickness, setBevelThickness] = useState(0.02)
+  const [bevelSize, setBevelSize] = useState(0.02)
+  const [bevelOffset, setBevelOffset] = useState(0)
+  const [bevelSegments, setBevelSegments] = useState(3)
 
   const fonts = [
     { name: 'Noto Sans JP (日本語)', path: '/fonts/Noto Sans JP Black_Regular.json' },
@@ -49,11 +57,14 @@ export default function Home() {
         <Center>
           <Text3D
             font={fontPath}
-            size={1}
-            height={0.2}
-            bevelEnabled
-            bevelSize={0.02}
-            bevelThickness={0.02}
+            size={size}
+            height={height}
+            curveSegments={curveSegments}
+            bevelEnabled={bevelEnabled}
+            bevelThickness={bevelThickness}
+            bevelSize={bevelSize}
+            bevelOffset={bevelOffset}
+            bevelSegments={bevelSegments}
           >
             {sanitized}
             <meshStandardMaterial color={color} />
@@ -74,7 +85,7 @@ export default function Home() {
             <Text3DLocal text={text} color={color} fontPath={selectedFont} />
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-4 overflow-y-auto max-h-[600px] pr-2">
             <div>
               <label htmlFor="text-input" className="block mb-2 text-sm font-medium">
                 Text / テキスト
@@ -127,34 +138,130 @@ export default function Home() {
               />
             </div>
             
-            <div>
-              <label htmlFor="outline-width" className="block mb-2 text-sm font-medium">
-                Outline Width / 縁取り幅
-              </label>
-              <input
-                id="outline-width"
-                type="range"
-                min="0"
-                max="0.2"
-                step="0.01"
-                value={outlineWidth}
-                onChange={(e) => setOutlineWidth(parseFloat(e.target.value))}
-                className="w-full"
-              />
-              <span className="text-xs text-gray-400">{outlineWidth.toFixed(2)}</span>
-            </div>
-            
-            <div>
-              <label htmlFor="outline-color" className="block mb-2 text-sm font-medium">
-                Outline Color / 縁取り色
-              </label>
-              <input
-                id="outline-color"
-                type="color"
-                value={outlineColor}
-                onChange={(e) => setOutlineColor(e.target.value)}
-                className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
-              />
+            {/* Text3D Parameters */}
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">3D Parameters</h3>
+              
+              <div>
+                <label className="block mb-1 text-sm">
+                  Size / サイズ: {size.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="3"
+                  step="0.1"
+                  value={size}
+                  onChange={(e) => setSize(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Height (Depth) / 高さ（奥行き）: {height.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={height}
+                  onChange={(e) => setHeight(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  Curve Segments / カーブ分割数: {curveSegments}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="20"
+                  step="1"
+                  value={curveSegments}
+                  onChange={(e) => setCurveSegments(parseInt(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="flex items-center space-x-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={bevelEnabled}
+                    onChange={(e) => setBevelEnabled(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span>Bevel Enabled / ベベル有効</span>
+                </label>
+              </div>
+
+              {bevelEnabled && (
+                <>
+                  <div>
+                    <label className="block mb-1 text-sm">
+                      Bevel Thickness / ベベル厚さ: {bevelThickness.toFixed(3)}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="0.1"
+                      step="0.001"
+                      value={bevelThickness}
+                      onChange={(e) => setBevelThickness(parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-1 text-sm">
+                      Bevel Size / ベベルサイズ: {bevelSize.toFixed(3)}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="0.1"
+                      step="0.001"
+                      value={bevelSize}
+                      onChange={(e) => setBevelSize(parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-1 text-sm">
+                      Bevel Offset / ベベルオフセット: {bevelOffset.toFixed(3)}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="0.05"
+                      step="0.001"
+                      value={bevelOffset}
+                      onChange={(e) => setBevelOffset(parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-1 text-sm">
+                      Bevel Segments / ベベル分割数: {bevelSegments}
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      step="1"
+                      value={bevelSegments}
+                      onChange={(e) => setBevelSegments(parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
