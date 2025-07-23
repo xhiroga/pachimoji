@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, memo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Text3D, Center, OrbitControls } from '@react-three/drei'
 
@@ -34,46 +34,54 @@ export default function Home() {
     link.click()
   }, [])
 
-  // 内部 3D テキストレンダラー
-  const Text3DLocal = ({
+  // Text3Dコンテンツのみ（Canvasの外）
+  const Text3DContent = memo(({
     text,
     color,
     fontPath,
+    size,
+    height,
+    curveSegments,
+    bevelEnabled,
+    bevelThickness,
+    bevelSize,
+    bevelOffset,
+    bevelSegments,
   }: {
     text: string
     color: string
     fontPath: string
+    size: number
+    height: number
+    curveSegments: number
+    bevelEnabled: boolean
+    bevelThickness: number
+    bevelSize: number
+    bevelOffset: number
+    bevelSegments: number
   }) => {
     const sanitized = text.replace(/\n/g, ' ')
     return (
-      <Canvas
-        camera={{ position: [0, 0, 5] }}
-        gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
-        style={{ width: '100%', height: '100%' }}
-      >
-        <ambientLight intensity={1} />
-        <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
-        <directionalLight position={[-5, -5, 5]} intensity={0.6} />
-        <Center>
-          <Text3D
-            font={fontPath}
-            size={size}
-            height={height}
-            curveSegments={curveSegments}
-            bevelEnabled={bevelEnabled}
-            bevelThickness={bevelThickness}
-            bevelSize={bevelSize}
-            bevelOffset={bevelOffset}
-            bevelSegments={bevelSegments}
-          >
-            {sanitized}
-            <meshStandardMaterial color={color} />
-          </Text3D>
-        </Center>
-        <OrbitControls enablePan enableZoom enableRotate />
-      </Canvas>
+      <Center>
+        <Text3D
+          font={fontPath}
+          size={size}
+          height={height}
+          curveSegments={curveSegments}
+          bevelEnabled={bevelEnabled}
+          bevelThickness={bevelThickness}
+          bevelSize={bevelSize}
+          bevelOffset={bevelOffset}
+          bevelSegments={bevelSegments}
+        >
+          {sanitized}
+          <meshStandardMaterial color={color} />
+        </Text3D>
+      </Center>
     )
-  }
+  })
+
+  Text3DContent.displayName = 'Text3DContent'
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -82,7 +90,29 @@ export default function Home() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 h-[600px] bg-white rounded-lg overflow-hidden border border-gray-200">
-            <Text3DLocal text={text} color={color} fontPath={selectedFont} />
+            <Canvas
+              camera={{ position: [0, 0, 5] }}
+              gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
+              style={{ width: '100%', height: '100%' }}
+            >
+              <ambientLight intensity={1} />
+              <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
+              <directionalLight position={[-5, -5, 5]} intensity={0.6} />
+              <Text3DContent
+                text={text}
+                color={color}
+                fontPath={selectedFont}
+                size={size}
+                height={height}
+                curveSegments={curveSegments}
+                bevelEnabled={bevelEnabled}
+                bevelThickness={bevelThickness}
+                bevelSize={bevelSize}
+                bevelOffset={bevelOffset}
+                bevelSegments={bevelSegments}
+              />
+              <OrbitControls enablePan enableZoom enableRotate />
+            </Canvas>
           </div>
           
           <div className="space-y-4 overflow-y-auto max-h-[600px] pr-2">
