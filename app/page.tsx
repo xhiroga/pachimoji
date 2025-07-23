@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import dynamic from 'next/dynamic'
-
-const Text3D = dynamic(() => import('@/components/Text3D'), { ssr: false })
+import { Canvas } from '@react-three/fiber'
+import { Text3D, Center, OrbitControls } from '@react-three/drei'
 
 export default function Home() {
   const [text, setText] = useState('全国最大級')
@@ -27,6 +26,44 @@ export default function Home() {
     link.click()
   }, [])
 
+  // 内部 3D テキストレンダラー
+  const Text3DLocal = ({
+    text,
+    color,
+    fontPath,
+  }: {
+    text: string
+    color: string
+    fontPath: string
+  }) => {
+    const sanitized = text.replace(/\n/g, ' ')
+    return (
+      <Canvas
+        camera={{ position: [0, 0, 5] }}
+        gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <ambientLight intensity={1} />
+        <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
+        <directionalLight position={[-5, -5, 5]} intensity={0.6} />
+        <Center>
+          <Text3D
+            font={fontPath}
+            size={1}
+            height={0.2}
+            bevelEnabled
+            bevelSize={0.02}
+            bevelThickness={0.02}
+          >
+            {sanitized}
+            <meshStandardMaterial color={color} />
+          </Text3D>
+        </Center>
+        <OrbitControls enablePan enableZoom enableRotate />
+      </Canvas>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <div className="container mx-auto p-8">
@@ -34,28 +71,30 @@ export default function Home() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 h-[600px] bg-white rounded-lg overflow-hidden border border-gray-200">
-            <Text3D 
-              text={text} 
-              color={color} 
-              font={selectedFont}
-              outlineWidth={outlineWidth}
-              outlineColor={outlineColor}
-            />
+            <Text3DLocal text={text} color={color} fontPath={selectedFont} />
           </div>
           
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div>
               <label htmlFor="text-input" className="block mb-2 text-sm font-medium">
                 Text / テキスト
               </label>
-              <button
-                type="button"
-                onClick={handleDownload}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                PNG ダウンロード
-              </button>
+              <input
+                id="text-input"
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              />
             </div>
+
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-full"
+            >
+              PNG ダウンロード
+            </button>
             
             <div>
               <label htmlFor="font-select" className="block mb-2 text-sm font-medium">
