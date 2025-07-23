@@ -23,7 +23,11 @@
       "mcp__ide__getDiagnostics",
       "Bash(lsof:*)",
       "Bash(pnpm run:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(open \"http://localhost:3000\")",
+      "mcp__ide__executeCode",
+      "Bash(cp:*)",
+      "Bash(find:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
