@@ -1,5 +1,5 @@
 {
-  "name": "3d-text-worker",
+  "name": "3dtext",
   "compatibility_date": "2025-07-23",
   "assets": {
     "directory": "./dist"
