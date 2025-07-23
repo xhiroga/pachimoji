@@ -481,6 +481,65 @@ export default function Home() {
                 </>
               )}
             </div>
+            
+            {/* JSON Settings */}
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">Settings (JSON) / 設定（JSON）</h3>
+              
+              <textarea
+                value={JSON.stringify({
+                  text,
+                  color,
+                  bevelColor,
+                  selectedFont,
+                  metalness,
+                  roughness,
+                  emissive,
+                  emissiveIntensity,
+                  ambientIntensity,
+                  mainLightIntensity,
+                  sideLightIntensity,
+                  size,
+                  height,
+                  curveSegments,
+                  bevelEnabled,
+                  bevelThickness,
+                  bevelSize,
+                  bevelOffset,
+                  bevelSegments
+                }, null, 2)}
+                onChange={(e) => {
+                  try {
+                    const settings = JSON.parse(e.target.value)
+                    
+                    // Apply settings with validation
+                    if (settings.text !== undefined) setText(settings.text)
+                    if (settings.color !== undefined) setColor(settings.color)
+                    if (settings.bevelColor !== undefined) setBevelColor(settings.bevelColor)
+                    if (settings.selectedFont !== undefined) setSelectedFont(settings.selectedFont)
+                    if (settings.metalness !== undefined) setMetalness(settings.metalness)
+                    if (settings.roughness !== undefined) setRoughness(settings.roughness)
+                    if (settings.emissive !== undefined) setEmissive(settings.emissive)
+                    if (settings.emissiveIntensity !== undefined) setEmissiveIntensity(settings.emissiveIntensity)
+                    if (settings.ambientIntensity !== undefined) setAmbientIntensity(settings.ambientIntensity)
+                    if (settings.mainLightIntensity !== undefined) setMainLightIntensity(settings.mainLightIntensity)
+                    if (settings.sideLightIntensity !== undefined) setSideLightIntensity(settings.sideLightIntensity)
+                    if (settings.size !== undefined) setSize(settings.size)
+                    if (settings.height !== undefined) setHeight(settings.height)
+                    if (settings.curveSegments !== undefined) setCurveSegments(settings.curveSegments)
+                    if (settings.bevelEnabled !== undefined) setBevelEnabled(settings.bevelEnabled)
+                    if (settings.bevelThickness !== undefined) setBevelThickness(settings.bevelThickness)
+                    if (settings.bevelSize !== undefined) setBevelSize(settings.bevelSize)
+                    if (settings.bevelOffset !== undefined) setBevelOffset(settings.bevelOffset)
+                    if (settings.bevelSegments !== undefined) setBevelSegments(settings.bevelSegments)
+                  } catch (error) {
+                    // Invalid JSON - ignore
+                  }
+                }}
+                className="w-full h-32 px-3 py-2 bg-white border border-gray-300 rounded-lg font-mono text-xs overflow-auto resize-none focus:outline-none focus:border-blue-500"
+                spellCheck={false}
+              />
+            </div>
           </div>
         </div>
       </div>
