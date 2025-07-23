@@ -17,7 +17,7 @@ interface Text3DProps {
   outlineColor?: string
 }
 
-function TextContent({ 
+function TextContent({
   text, 
   color = "#ffffff", 
   size = 1, 
@@ -55,9 +55,25 @@ export default function Text3DComponent({
   return (
     <div className="w-full h-full">
       <Canvas camera={{ position: [0, 0, 5] }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} />
-        <pointLight position={[-10, -10, -10]} intensity={0.3} />
+        {/* 全体を明るくするためにライト構成を強化 */}
+        <ambientLight intensity={1} />
+        {/* キーライト */}
+        <directionalLight
+          position={[5, 10, 5]}
+          intensity={1.2}
+          castShadow
+        />
+        {/* 補助ライト */}
+        <directionalLight
+          position={[-5, -5, 5]}
+          intensity={0.6}
+        />
+        {/* 柔らかい空からの光 */}
+        <hemisphereLight
+          intensity={0.5}
+          color={0xffffff}
+          groundColor={0x444444}
+        />
         <Suspense fallback={null}>
           <TextContent 
             text={text} 
