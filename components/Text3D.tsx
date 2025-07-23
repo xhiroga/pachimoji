@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { Canvas } from '@react-three/fiber'
-import { Text, Center, OrbitControls } from '@react-three/drei'
+import { Canvas, useLoader } from '@react-three/fiber'
+import { Text3D, Center, OrbitControls } from '@react-three/drei'
 import { Suspense } from 'react'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - three provides the declaration but path resolution may fail without .js
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 
 interface Text3DProps {
   text: string
@@ -17,28 +21,25 @@ function TextContent({
   text, 
   color = "#ffffff", 
   size = 1, 
-  font,
+  font = "/fonts/helvetiker_regular.typeface.json",
   outlineWidth = 0.05,
   outlineColor = "#000000"
 }: Text3DProps) {
+
   return (
     <Center>
-      <Text
+      <Text3D
         font={font}
-        fontSize={size}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={outlineWidth}
-        outlineColor={outlineColor}
-        maxWidth={20}
-        lineHeight={1}
-        letterSpacing={0.02}
-        textAlign="center"
+        size={size}
+        height={0.2}
+        curveSegments={12}
+        bevelEnabled
+        bevelSize={0.02}
+        bevelThickness={0.02}
       >
         {text}
-        <meshStandardMaterial />
-      </Text>
+        <meshStandardMaterial color={color} />
+      </Text3D>
     </Center>
   )
 }
@@ -47,7 +48,7 @@ export default function Text3DComponent({
   text = "3D Text", 
   color = "#ffffff", 
   size = 1, 
-  font,
+  font = "/fonts/helvetiker_regular.typeface.json",
   outlineWidth = 0.05,
   outlineColor = "#000000"
 }: Text3DProps) {
