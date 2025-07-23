@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useCallback, memo } from 'react'
-import { Canvas, useThree } from '@react-three/fiber'
-import { Text3D, Center, OrbitControls, TransformControls } from '@react-three/drei'
+import { Canvas } from '@react-three/fiber'
+import { Text3D, Center, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { useRef } from 'react'
 
 export default function Home() {
   const [text, setText] = useState('全国最大級')
@@ -13,31 +12,25 @@ export default function Home() {
   const [selectedFont, setSelectedFont] = useState('/fonts/Noto Sans JP Black_Regular.json')
   
   // Material Effects
-  const [metalness, setMetalness] = useState(0.5)
-  const [roughness, setRoughness] = useState(0.1)
-  const [emissive, setEmissive] = useState('#000000')
+  const [metalness, setMetalness] = useState(1.0)
+  const [roughness, setRoughness] = useState(0.6)
+  const [emissive, setEmissive] = useState('#ffffff')
   const [emissiveIntensity, setEmissiveIntensity] = useState(0)
   
   // Lighting Controls
-  const [ambientIntensity, setAmbientIntensity] = useState(0.3)
-  const [mainLightIntensity, setMainLightIntensity] = useState(2.0)
-  const [sideLightIntensity, setSideLightIntensity] = useState(1.5)
-  const [spotLightIntensity, setSpotLightIntensity] = useState(3.0)
-  const [pointLightIntensity, setPointLightIntensity] = useState(1.2)
-  
-  // Interactive Light Controls
-  const [interactiveLightIntensity, setInteractiveLightIntensity] = useState(2.5)
-  const [showLightHelper, setShowLightHelper] = useState(true)
+  const [ambientIntensity, setAmbientIntensity] = useState(1.0)
+  const [mainLightIntensity, setMainLightIntensity] = useState(20.0)
+  const [sideLightIntensity, setSideLightIntensity] = useState(20.0)
   
   // Text3D Parameters
   const [size, setSize] = useState(1)
   const [height, setHeight] = useState(1) // デフォルト1に変更
   const [curveSegments, setCurveSegments] = useState(12)
   const [bevelEnabled, setBevelEnabled] = useState(true)
-  const [bevelThickness, setBevelThickness] = useState(0.02)
+  const [bevelThickness, setBevelThickness] = useState(0.1)
   const [bevelSize, setBevelSize] = useState(0.1) // デフォルト0.1に変更
   const [bevelOffset, setBevelOffset] = useState(0)
-  const [bevelSegments, setBevelSegments] = useState(3)
+  const [bevelSegments, setBevelSegments] = useState(5)
 
   const fonts = [
     { name: 'Noto Sans JP (日本語)', path: '/fonts/Noto Sans JP Black_Regular.json' },
@@ -139,44 +132,6 @@ export default function Home() {
 
   Text3DContent.displayName = 'Text3DContent'
 
-  // インタラクティブライトコンポーネント
-  const InteractiveLight = memo(({ intensity, showHelper }: { intensity: number, showHelper: boolean }) => {
-    const lightRef = useRef<THREE.DirectionalLight>(null)
-    const helperRef = useRef<THREE.Mesh>(null)
-
-    return (
-      <group>
-        {/* インタラクティブな方向ライト */}
-        <directionalLight
-          ref={lightRef}
-          position={[0, 3, 3]} // 文字の正面やや上
-          intensity={intensity}
-          color="#ffffff"
-          castShadow
-        />
-        
-        {showHelper && lightRef.current && (
-          <>
-            <TransformControls
-              object={lightRef.current}
-              mode="translate"
-              showX={true}
-              showY={true}
-              showZ={true}
-              size={0.5}
-            />
-            {/* ライトの位置を示すビジュアルヘルパー */}
-            <mesh ref={helperRef} position={[0, 3, 3]}>
-              <sphereGeometry args={[0.15, 16, 16]} />
-              <meshBasicMaterial color="#ffff00" transparent opacity={0.8} />
-            </mesh>
-          </>
-        )}
-      </group>
-    )
-  })
-
-  InteractiveLight.displayName = 'InteractiveLight'
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -190,36 +145,14 @@ export default function Home() {
               gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
               style={{ width: '100%', height: '100%' }}
             >
-              {/* パチンコ店風ド派手ライティング召喚 */}
+              {/* シンプルな3灯ライティング */}
               <ambientLight intensity={ambientIntensity} color="#ffffff" />
               
               {/* メインライト（正面上から） */}
               <directionalLight position={[0, 10, 5]} intensity={mainLightIntensity} color="#ffffff" castShadow />
               
-              {/* サイドライト（左右から） */}
-              <directionalLight position={[10, 5, 3]} intensity={sideLightIntensity} color="#ffff99" />
-              <directionalLight position={[-10, 5, 3]} intensity={sideLightIntensity} color="#ffff99" />
-              
-              {/* バックライト（後ろから） */}
-              <directionalLight position={[0, 2, -5]} intensity={sideLightIntensity * 0.5} color="#ffffcc" />
-              
-              {/* スポットライト（上から集中照射） */}
-              <spotLight
-                position={[0, 15, 0]}
-                angle={Math.PI / 6}
-                penumbra={0.3}
-                intensity={spotLightIntensity}
-                color="#ffffff"
-                castShadow
-              />
-              
-              {/* ポイントライト（キラキラ効果用） */}
-              <pointLight position={[5, 5, 5]} intensity={pointLightIntensity} color="#ffdd44" />
-              <pointLight position={[-5, 5, 5]} intensity={pointLightIntensity} color="#ffdd44" />
-              <pointLight position={[0, -3, 8]} intensity={pointLightIntensity * 0.7} color="#ffffaa" />
-              
-              {/* インタラクティブライト */}
-              <InteractiveLight intensity={interactiveLightIntensity} showHelper={showLightHelper} />
+              {/* サイドライト（右から） */}
+              <directionalLight position={[5, 3, 0]} intensity={sideLightIntensity} color="#ffff99" />
               
               <Text3DContent
                 text={text}
@@ -239,7 +172,7 @@ export default function Home() {
                 emissive={emissive}
                 emissiveIntensity={emissiveIntensity}
               />
-              <OrbitControls enablePan enableZoom enableRotate />
+              <OrbitControls enablePan={false} enableZoom enableRotate />
             </Canvas>
           </div>
           
@@ -384,7 +317,7 @@ export default function Home() {
                 <input
                   type="range"
                   min="0"
-                  max="2"
+                  max="10"
                   step="0.1"
                   value={ambientIntensity}
                   onChange={(e) => setAmbientIntensity(parseFloat(e.target.value))}
@@ -399,7 +332,7 @@ export default function Home() {
                 <input
                   type="range"
                   min="0"
-                  max="5"
+                  max="50"
                   step="0.1"
                   value={mainLightIntensity}
                   onChange={(e) => setMainLightIntensity(parseFloat(e.target.value))}
@@ -414,69 +347,12 @@ export default function Home() {
                 <input
                   type="range"
                   min="0"
-                  max="3"
+                  max="30"
                   step="0.1"
                   value={sideLightIntensity}
                   onChange={(e) => setSideLightIntensity(parseFloat(e.target.value))}
                   className="w-full"
                 />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm">
-                  Spot Light / スポットライト: {spotLightIntensity.toFixed(2)}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="5"
-                  step="0.1"
-                  value={spotLightIntensity}
-                  onChange={(e) => setSpotLightIntensity(parseFloat(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm">
-                  Point Light / ポイントライト: {pointLightIntensity.toFixed(2)}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="3"
-                  step="0.1"
-                  value={pointLightIntensity}
-                  onChange={(e) => setPointLightIntensity(parseFloat(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm">
-                  Interactive Light / 操作可能ライト: {interactiveLightIntensity.toFixed(2)}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="5"
-                  step="0.1"
-                  value={interactiveLightIntensity}
-                  onChange={(e) => setInteractiveLightIntensity(parseFloat(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label className="flex items-center space-x-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={showLightHelper}
-                    onChange={(e) => setShowLightHelper(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <span>Show Light Handle / ライトハンドル表示</span>
-                </label>
               </div>
             </div>
             
@@ -550,7 +426,7 @@ export default function Home() {
                     <input
                       type="range"
                       min="0"
-                      max="0.1"
+                      max="1"
                       step="0.001"
                       value={bevelThickness}
                       onChange={(e) => setBevelThickness(parseFloat(e.target.value))}
