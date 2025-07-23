@@ -6,14 +6,16 @@ import dynamic from 'next/dynamic'
 const Text3D = dynamic(() => import('@/components/Text3D'), { ssr: false })
 
 export default function Home() {
-  const [text, setText] = useState('こんにちは')
+  const [text, setText] = useState('hi')
   const [color, setColor] = useState('#ffffff')
-  const [selectedFont, setSelectedFont] = useState('https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEi75vY0rw-oME.woff')
+  const [selectedFont, setSelectedFont] = useState('/fonts/helvetiker_regular.typeface.json')
   const [outlineWidth, setOutlineWidth] = useState(0.05)
   const [outlineColor, setOutlineColor] = useState('#000000')
 
   const fonts = [
-    { name: 'Noto Sans JP (日本語)', path: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEi75vY0rw-oME.woff' },
+    { name: 'Helvetiker (標準)', path: '/fonts/helvetiker_regular.typeface.json' },
+    // { name: 'Noto Sans JP ExtraBold (ローカル JSON)', path: '/fonts/Noto_Sans_JP_ExtraBold_Regular.json' },
+    { name: 'Noto Sans JP (日本語)', path: '/fonts/Noto Sans JP Black_Regular.json' },
     { name: 'Roboto', path: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2' },
     { name: 'Open Sans', path: 'https://fonts.gstatic.com/s/opensans/v40/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4gaVI.woff2' },
     { name: 'Montserrat', path: 'https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459Wlhyw.woff2' },
