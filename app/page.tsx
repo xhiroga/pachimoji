@@ -34,9 +34,9 @@ export default function Home() {
   const [bevelSegments, setBevelSegments] = useState(5)
 
   const fonts = [
-    { name: 'Noto Sans JP (日本語)', path: '/fonts/Noto Sans JP Black_Regular.json' },
-    { name: 'Tamanegi Kaisho Geki (手書き風)', path: '/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
-    { name: 'Helvetiker (標準)', path: '/fonts/helvetiker_regular.typeface.json' },
+    { name: 'ゴシック（Noto Sans）', path: '/fonts/Noto Sans JP Black_Regular.json' },
+    { name: '明朝体（装甲明朝）', path: '/fonts/SoukouMincho_Regular.json' },
+    { name: '筆文字（玉ねぎ楷書「激」）', path: '/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
   ]
 
   const textures = [
