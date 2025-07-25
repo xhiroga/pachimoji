@@ -35,6 +35,7 @@ export default function Home() {
 
   const fonts = [
     { name: 'Noto Sans JP (日本語)', path: '/fonts/Noto Sans JP Black_Regular.json' },
+    { name: 'Tamanegi Kaisho Geki (手書き風)', path: '/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
     { name: 'Helvetiker (標準)', path: '/fonts/helvetiker_regular.typeface.json' },
   ]
 
