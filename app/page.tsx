@@ -9,7 +9,7 @@ export default function Home() {
   const [text, setText] = useState('全国最大級')
   const [color, setColor] = useState('#FFD700') // ゴールド色
   const [bevelColor, setBevelColor] = useState('#8B4513') // 茶色
-  const [selectedFont, setSelectedFont] = useState('/fonts/Noto Sans JP Black_Regular.json')
+  const [selectedFont, setSelectedFont] = useState('https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json')
   
   // Material Effects
   const [metalness, setMetalness] = useState(1.0)
@@ -34,8 +34,9 @@ export default function Home() {
   const [bevelSegments, setBevelSegments] = useState(5)
 
   const fonts = [
-    { name: 'ゴシック（Noto Sans）', path: '/fonts/Noto Sans JP Black_Regular.json' },
-    { name: '筆文字（玉ねぎ楷書「激」）', path: '/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
+    { name: 'ゴシック（Noto Sans）', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json' },
+    { name: '筆文字（玉ねぎ楷書「激」）', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
+    { name: '装甲明朝', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json' },
   ]
 
   const textures = [
