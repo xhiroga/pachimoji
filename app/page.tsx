@@ -765,6 +765,37 @@ export default function Home() {
             ))}
           </div>
         </div>
+        
+        {/* フッター */}
+        <footer className="mt-16 pt-8 border-t border-gray-200 text-center">
+          <p className="text-xs text-gray-500 mb-2">使用フォント / Fonts Used</p>
+          <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-400">
+            <a 
+              href="https://fonts.google.com/noto/specimen/Noto+Sans+JP" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-gray-600 underline"
+            >
+              Noto Sans JP
+            </a>
+            <a 
+              href="https://booth.pm/ja/items/2929647" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-gray-600 underline"
+            >
+              玉ねぎ楷書「激」
+            </a>
+            <a 
+              href="https://flopdesign.booth.pm/items/1028555" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-gray-600 underline"
+            >
+              装甲明朝
+            </a>
+          </div>
+        </footer>
       </div>
     </div>
   )
