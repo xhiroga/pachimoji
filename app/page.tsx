@@ -291,9 +291,53 @@ export default function Home() {
   Text3DContent.displayName = 'Text3DContent'
 
 
+  // 構造化データ (JSON-LD)
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "パチ文字メーカー",
+    "alternateName": "3D Text Maker",
+    "description": "パチンコでよく見る豪華な文字を簡単に作成できる無料のオンライン3Dツール。チラシ、ポスター、SNS投稿用の派手な文字デザインが誰でも簡単に作れます。",
+    "url": "https://3dtext.sawara.dev",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "パチ文字メーカー"
+    },
+    "featureList": [
+      "3D文字作成",
+      "日本語フォント対応",
+      "リアルタイム編集",
+      "カラーカスタマイズ",
+      "マテリアル効果",
+      "ライティング制御",
+      "PNG書き出し"
+    ],
+    "screenshot": "https://3dtext.sawara.dev/og-image.png",
+    "softwareVersion": "1.0",
+    "datePublished": "2025-01-31",
+    "dateModified": "2025-01-31",
+    "inLanguage": ["ja", "en"],
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "デザイナー、チラシ制作者、SNS運用担当者、パチンコホール広報担当者"
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      <div className="container mx-auto p-8">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="min-h-screen bg-white text-gray-900">
+        <div className="container mx-auto p-8">
         <div className="mb-8">
           <img
             src="/images/logo.png"
@@ -796,7 +840,8 @@ export default function Home() {
             </a>
           </div>
         </footer>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
