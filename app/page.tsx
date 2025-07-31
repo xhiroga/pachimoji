@@ -812,8 +812,8 @@ export default function Home() {
         
         {/* フッター */}
         <footer className="mt-16 pt-8 border-t border-gray-200 text-center">
-          <p className="text-xs text-gray-500 mb-2">使用フォント / Fonts Used</p>
-          <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-400">
+          <div className="flex items-center justify-center gap-1 text-xs text-gray-400 mb-4">
+            <span>使用フォント:</span>
             <a 
               href="https://fonts.google.com/noto/specimen/Noto+Sans+JP" 
               target="_blank" 
@@ -822,6 +822,7 @@ export default function Home() {
             >
               Noto Sans JP
             </a>
+            <span>・</span>
             <a 
               href="https://booth.pm/ja/items/2929647" 
               target="_blank" 
@@ -830,6 +831,7 @@ export default function Home() {
             >
               玉ねぎ楷書「激」
             </a>
+            <span>・</span>
             <a 
               href="https://flopdesign.booth.pm/items/1028555" 
               target="_blank" 
@@ -838,6 +840,36 @@ export default function Home() {
             >
               装甲明朝
             </a>
+          </div>
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+            <span>Made by</span>
+            <video
+              ref={(video) => {
+                if (video) {
+                  video.onclick = () => {
+                    // 最初から再生
+                    video.currentTime = 0
+                    video.play()
+                    // Google Analytics イベント送信
+                    if (typeof window !== 'undefined' && (window as any).gtag) {
+                      (window as any).gtag('event', 'sawara_dog_video_play', {
+                        event_category: 'engagement',
+                        event_label: 'footer_video'
+                      })
+                    }
+                  }
+                  // 動画が終わったら停止
+                  video.onended = () => {
+                    video.pause()
+                  }
+                }
+              }}
+              className="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+              muted
+              playsInline
+            >
+              <source src="/images/logo.mp4" type="video/mp4" />
+            </video>
           </div>
         </footer>
         </div>
