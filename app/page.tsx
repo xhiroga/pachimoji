@@ -293,7 +293,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <div className="container mx-auto p-8">
-        <h1 className="text-4xl font-bold mb-8 text-center">パチ文字メーカー</h1>
+        <div className="mb-8">
+          <img
+            src="/images/logo.png"
+            alt="パチ文字メーカー"
+            className="h-12"
+          />
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 h-[400px] bg-white rounded-lg overflow-hidden border border-gray-200">
