@@ -32,7 +32,7 @@ export default function Home() {
   const [bevelSize, setBevelSize] = useState(0.1) // デフォルト0.1に変更
   const [bevelOffset, setBevelOffset] = useState(0)
   const [bevelSegments, setBevelSegments] = useState(5)
-  const [letterSpacing, setLetterSpacing] = useState(0.9)
+  const [letterSpacing, setLetterSpacing] = useState(1.25)
 
   const fonts = [
     { name: 'ゴシック（Noto Sans）', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json' },
@@ -51,6 +51,7 @@ export default function Home() {
     {
       name: 'ゴールド＆ゴシック',
       text: '全国最大級',
+      image: '/images/sample-gothic.png',
       settings: {
         color: '#FFD700',
         bevelColor: '#8B4513',
@@ -71,59 +72,61 @@ export default function Home() {
         bevelOffset: 0,
         bevelSegments: 5,
         selectedTexture: 'none',
-        letterSpacing: 0.9
+        letterSpacing: 1.25
       }
     },
     {
       name: '激熱！筆文字',
-      text: '激アツ',
+      text: '激アツ!',
+      image: '/images/sample-kaisho.png',
       settings: {
         color: '#FF0000',
-        bevelColor: '#FFD700',
+        bevelColor: '#fbff24',
         selectedFont: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json',
         metalness: 0.8,
         roughness: 0.4,
         emissive: '#ff0000',
-        emissiveIntensity: 0.3,
+        emissiveIntensity: 0.34,
         ambientIntensity: 1.5,
         mainLightIntensity: 25,
         sideLightIntensity: 15,
-        size: 1.2,
-        height: 1.5,
-        curveSegments: 12,
+        size: 2.0,
+        height: 0.7,
+        curveSegments: 9,
         bevelEnabled: true,
-        bevelThickness: 0.15,
-        bevelSize: 0.15,
-        bevelOffset: 0,
-        bevelSegments: 5,
+        bevelThickness: 0.214,
+        bevelSize: 0.22,
+        bevelOffset: -0.022,
+        bevelSegments: 7,
         selectedTexture: 'none',
-        letterSpacing: 0.9
+        letterSpacing: 1.15
       }
     },
     {
       name: '高級感＆明朝',
-      text: '大当確定',
+      text: '新台入替',
+      image: '/images/sample-mincho.png',
       settings: {
-        color: '#00D4FF',
-        bevelColor: '#0080FF',
+        color: '#fff700',
+        bevelColor: '#6b00b3',
         selectedFont: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json',
-        metalness: 1,
-        roughness: 0.2,
+        metalness: 0.8,
+        roughness: 0.1,
         emissive: '#ffffff',
         emissiveIntensity: 0.1,
-        ambientIntensity: 0.8,
+        ambientIntensity: 2,
         mainLightIntensity: 30,
         sideLightIntensity: 25,
-        size: 0.9,
-        height: 0.8,
+        size: 1.7,
+        height: 2.1,
         curveSegments: 16,
         bevelEnabled: true,
-        bevelThickness: 0.08,
-        bevelSize: 0.08,
-        bevelOffset: 0,
+        bevelThickness: 0.19,
+        bevelSize: 0.1,
+        bevelOffset: 0.001,
         bevelSegments: 8,
-        selectedTexture: 'metal',
-        letterSpacing: 0.8
+        selectedTexture: 'none',
+        letterSpacing: 1.25
       }
     }
   ]
@@ -293,7 +296,7 @@ export default function Home() {
         <h1 className="text-4xl font-bold mb-8 text-center">パチ文字メーカー</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 h-[600px] bg-white rounded-lg overflow-hidden border border-gray-200">
+          <div className="lg:col-span-2 h-[400px] bg-white rounded-lg overflow-hidden border border-gray-200">
             <Canvas
               orthographic
               camera={{ position: [0, 0, 5], zoom: 100 }}
@@ -333,7 +336,7 @@ export default function Home() {
             </Canvas>
           </div>
           
-          <div className="space-y-4 overflow-y-auto max-h-[600px] pr-2">
+          <div className="space-y-4 overflow-y-auto max-h-[400px] pr-2">
             <div>
               <label htmlFor="text-input" className="block mb-2 text-sm font-medium">
                 Text / テキスト
@@ -371,6 +374,21 @@ export default function Home() {
                   </option>
                 ))}
               </select>
+            </div>
+            
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                Letter Spacing / 文字間隔: {letterSpacing.toFixed(2)}
+              </label>
+              <input
+                type="range"
+                min="0.3"
+                max="2.0"
+                step="0.05"
+                value={letterSpacing}
+                onChange={(e) => setLetterSpacing(parseFloat(e.target.value))}
+                className="w-full"
+              />
             </div>
             
             <div>
@@ -581,21 +599,6 @@ export default function Home() {
               </div>
 
               <div>
-                <label className="block mb-1 text-sm">
-                  Letter Spacing / 文字間隔: {letterSpacing.toFixed(2)}
-                </label>
-                <input
-                  type="range"
-                  min="0.3"
-                  max="2.0"
-                  step="0.05"
-                  value={letterSpacing}
-                  onChange={(e) => setLetterSpacing(parseFloat(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
                 <label className="flex items-center space-x-2 text-sm">
                   <input
                     type="checkbox"
@@ -746,38 +749,11 @@ export default function Home() {
                 <h3 className="text-lg font-bold mb-2">{preset.name}</h3>
                 <div className="mb-4">
                   <div className="h-32 bg-white rounded border border-gray-300 flex items-center justify-center relative overflow-hidden">
-                    <Canvas
-                      orthographic
-                      camera={{ position: [0, 0, 4], zoom: 80 }}
-                      gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
-                      style={{ width: '100%', height: '100%' }}
-                    >
-                      <ambientLight intensity={preset.settings.ambientIntensity} color="#ffffff" />
-                      <directionalLight position={[0, 10, 5]} intensity={preset.settings.mainLightIntensity} color="#ffffff" />
-                      <directionalLight position={[5, 3, 0]} intensity={preset.settings.sideLightIntensity} color="#ffff99" />
-                      
-                      <Text3DContent
-                        text={preset.text}
-                        color={preset.settings.color}
-                        bevelColor={preset.settings.bevelColor}
-                        fontPath={preset.settings.selectedFont}
-                        size={preset.settings.size * 0.8}
-                        height={preset.settings.height}
-                        curveSegments={preset.settings.curveSegments}
-                        bevelEnabled={preset.settings.bevelEnabled}
-                        bevelThickness={preset.settings.bevelThickness}
-                        bevelSize={preset.settings.bevelSize}
-                        bevelOffset={preset.settings.bevelOffset}
-                        bevelSegments={preset.settings.bevelSegments}
-                        metalness={preset.settings.metalness}
-                        roughness={preset.settings.roughness}
-                        emissive={preset.settings.emissive}
-                        emissiveIntensity={preset.settings.emissiveIntensity}
-                        selectedTexture={preset.settings.selectedTexture}
-                        letterSpacing={preset.settings.letterSpacing}
-                      />
-                      <OrbitControls enablePan={false} enableZoom={false} enableRotate={false} />
-                    </Canvas>
+                    <img
+                      src={preset.image}
+                      alt={preset.name}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                 </div>
                 <button
