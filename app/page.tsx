@@ -45,6 +45,85 @@ export default function Home() {
     { name: 'Metal Gloss / 金属光沢', value: 'gloss', path: '/textures/pierre-bamin-_EzTds6Fo44-unsplash.jpg' },
   ]
 
+  // プリセットスタイル
+  const presets = [
+    {
+      name: 'ゴールド＆ゴシック',
+      text: '全国最大級',
+      settings: {
+        color: '#FFD700',
+        bevelColor: '#8B4513',
+        selectedFont: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json',
+        metalness: 1,
+        roughness: 0.6,
+        emissive: '#ffffff',
+        emissiveIntensity: 0,
+        ambientIntensity: 1,
+        mainLightIntensity: 20,
+        sideLightIntensity: 20,
+        size: 1,
+        height: 1,
+        curveSegments: 12,
+        bevelEnabled: true,
+        bevelThickness: 0.1,
+        bevelSize: 0.1,
+        bevelOffset: 0,
+        bevelSegments: 5,
+        selectedTexture: 'none'
+      }
+    },
+    {
+      name: '激熱！筆文字',
+      text: '激アツ',
+      settings: {
+        color: '#FF0000',
+        bevelColor: '#FFD700',
+        selectedFont: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json',
+        metalness: 0.8,
+        roughness: 0.4,
+        emissive: '#ff0000',
+        emissiveIntensity: 0.3,
+        ambientIntensity: 1.5,
+        mainLightIntensity: 25,
+        sideLightIntensity: 15,
+        size: 1.2,
+        height: 1.5,
+        curveSegments: 12,
+        bevelEnabled: true,
+        bevelThickness: 0.15,
+        bevelSize: 0.15,
+        bevelOffset: 0,
+        bevelSegments: 5,
+        selectedTexture: 'none'
+      }
+    },
+    {
+      name: '高級感＆明朝',
+      text: '大当確定',
+      settings: {
+        color: '#00D4FF',
+        bevelColor: '#0080FF',
+        selectedFont: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json',
+        metalness: 1,
+        roughness: 0.2,
+        emissive: '#ffffff',
+        emissiveIntensity: 0.1,
+        ambientIntensity: 0.8,
+        mainLightIntensity: 30,
+        sideLightIntensity: 25,
+        size: 0.9,
+        height: 0.8,
+        curveSegments: 16,
+        bevelEnabled: true,
+        bevelThickness: 0.08,
+        bevelSize: 0.08,
+        bevelOffset: 0,
+        bevelSegments: 8,
+        selectedTexture: 'metal'
+      }
+    }
+  ]
+
   // Canvas を PNG としてダウンロード
   const handleDownload = useCallback(() => {
     const canvas = document.querySelector('canvas') as HTMLCanvasElement | null
@@ -53,6 +132,30 @@ export default function Home() {
     link.download = '3dtext.png'
     link.href = canvas.toDataURL('image/png')
     link.click()
+  }, [])
+
+  // プリセットを適用する関数
+  const applyPreset = useCallback((preset: typeof presets[0]) => {
+    setText(preset.text)
+    setColor(preset.settings.color)
+    setBevelColor(preset.settings.bevelColor)
+    setSelectedFont(preset.settings.selectedFont)
+    setMetalness(preset.settings.metalness)
+    setRoughness(preset.settings.roughness)
+    setEmissive(preset.settings.emissive)
+    setEmissiveIntensity(preset.settings.emissiveIntensity)
+    setAmbientIntensity(preset.settings.ambientIntensity)
+    setMainLightIntensity(preset.settings.mainLightIntensity)
+    setSideLightIntensity(preset.settings.sideLightIntensity)
+    setSize(preset.settings.size)
+    setHeight(preset.settings.height)
+    setCurveSegments(preset.settings.curveSegments)
+    setBevelEnabled(preset.settings.bevelEnabled)
+    setBevelThickness(preset.settings.bevelThickness)
+    setBevelSize(preset.settings.bevelSize)
+    setBevelOffset(preset.settings.bevelOffset)
+    setBevelSegments(preset.settings.bevelSegments)
+    setSelectedTexture(preset.settings.selectedTexture)
   }, [])
 
   // Text3Dコンテンツのみ（Canvasの外）
@@ -595,6 +698,58 @@ export default function Home() {
                 spellCheck={false}
               />
             </div>
+          </div>
+        </div>
+        
+        {/* プリセットスタイル */}
+        <div className="mt-12 pb-8">
+          <h2 className="text-2xl font-bold mb-6 text-center">スタイルプリセット</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {presets.map((preset, index) => (
+              <div key={index} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                <h3 className="text-lg font-bold mb-2">{preset.name}</h3>
+                <div className="mb-4">
+                  <div className="h-32 bg-white rounded border border-gray-300 flex items-center justify-center relative overflow-hidden">
+                    <Canvas
+                      camera={{ position: [0, 0, 4] }}
+                      gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
+                      style={{ width: '100%', height: '100%' }}
+                    >
+                      <ambientLight intensity={preset.settings.ambientIntensity} color="#ffffff" />
+                      <directionalLight position={[0, 10, 5]} intensity={preset.settings.mainLightIntensity} color="#ffffff" />
+                      <directionalLight position={[5, 3, 0]} intensity={preset.settings.sideLightIntensity} color="#ffff99" />
+                      
+                      <Text3DContent
+                        text={preset.text}
+                        color={preset.settings.color}
+                        bevelColor={preset.settings.bevelColor}
+                        fontPath={preset.settings.selectedFont}
+                        size={preset.settings.size * 0.8}
+                        height={preset.settings.height}
+                        curveSegments={preset.settings.curveSegments}
+                        bevelEnabled={preset.settings.bevelEnabled}
+                        bevelThickness={preset.settings.bevelThickness}
+                        bevelSize={preset.settings.bevelSize}
+                        bevelOffset={preset.settings.bevelOffset}
+                        bevelSegments={preset.settings.bevelSegments}
+                        metalness={preset.settings.metalness}
+                        roughness={preset.settings.roughness}
+                        emissive={preset.settings.emissive}
+                        emissiveIntensity={preset.settings.emissiveIntensity}
+                        selectedTexture={preset.settings.selectedTexture}
+                      />
+                      <OrbitControls enablePan={false} enableZoom={false} enableRotate={false} />
+                    </Canvas>
+                  </div>
+                </div>
+                <button
+                  onClick={() => applyPreset(preset)}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  このスタイルを使う
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
