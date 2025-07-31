@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "3D Text Editor",
+  title: "パチ文字メーカー",
   description: "Create stunning 3D text with customizable materials, lighting, and effects",
 };
 

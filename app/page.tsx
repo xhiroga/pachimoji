@@ -35,7 +35,6 @@ export default function Home() {
 
   const fonts = [
     { name: 'ゴシック（Noto Sans）', path: '/fonts/Noto Sans JP Black_Regular.json' },
-    { name: '明朝体（装甲明朝）', path: '/fonts/SoukouMincho_Regular.json' },
     { name: '筆文字（玉ねぎ楷書「激」）', path: '/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
   ]
 
@@ -170,7 +169,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <div className="container mx-auto p-8">
-        <h1 className="text-4xl font-bold mb-8 text-center">3D Text Editor</h1>
+        <h1 className="text-4xl font-bold mb-8 text-center">パチ文字メーカー</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 h-[600px] bg-white rounded-lg overflow-hidden border border-gray-200">
