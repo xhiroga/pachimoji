@@ -33,6 +33,7 @@ export default function Home() {
   const [bevelOffset, setBevelOffset] = useState(0)
   const [bevelSegments, setBevelSegments] = useState(5)
   const [letterSpacing, setLetterSpacing] = useState(1.25)
+  const [isJsonOpen, setIsJsonOpen] = useState(false)
 
   const fonts = [
     { name: 'ゴシック（Noto Sans）', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json' },
@@ -345,7 +346,7 @@ export default function Home() {
           <div className="space-y-4 overflow-y-auto max-h-[400px] pr-2">
             <div>
               <label htmlFor="text-input" className="block mb-2 text-sm font-medium">
-                Text / テキスト
+                テキスト / Text
               </label>
               <input
                 id="text-input"
@@ -366,7 +367,7 @@ export default function Home() {
             
             <div>
               <label htmlFor="font-select" className="block mb-2 text-sm font-medium">
-                Font / フォント
+                フォント / Font
               </label>
               <select
                 id="font-select"
@@ -384,7 +385,7 @@ export default function Home() {
             
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Letter Spacing / 文字間隔: {letterSpacing.toFixed(2)}
+                文字間隔 / Letter Spacing: {letterSpacing.toFixed(2)}
               </label>
               <input
                 type="range"
@@ -399,7 +400,7 @@ export default function Home() {
             
             <div>
               <label htmlFor="color-input" className="block mb-2 text-sm font-medium">
-                Face Color / 表面色
+                表面色 / Face Color
               </label>
               <input
                 id="color-input"
@@ -412,7 +413,7 @@ export default function Home() {
             
             <div>
               <label htmlFor="bevel-color-input" className="block mb-2 text-sm font-medium">
-                Bevel Color / ベベル色
+                ベベル色 / Bevel Color
               </label>
               <input
                 id="bevel-color-input"
@@ -423,13 +424,123 @@ export default function Home() {
               />
             </div>
             
-            {/* Material Effects */}
+            {/* 3D Parameters */}
             <div className="space-y-4 border-t pt-4">
-              <h3 className="font-medium">Material Effects / マテリアル効果</h3>
+              <h3 className="font-medium">3D設定 / 3D Parameters</h3>
               
               <div>
                 <label className="block mb-1 text-sm">
-                  Metalness / メタリック: {metalness.toFixed(2)}
+                  サイズ / Size: {size.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="3"
+                  step="0.1"
+                  value={size}
+                  onChange={(e) => setSize(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  高さ（奥行き） / Height (Depth): {height.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={height}
+                  onChange={(e) => setHeight(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  カーブ分割数 / Curve Segments: {curveSegments}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="20"
+                  step="1"
+                  value={curveSegments}
+                  onChange={(e) => setCurveSegments(parseInt(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  ベベル厚さ / Bevel Thickness: {bevelThickness.toFixed(3)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.001"
+                  value={bevelThickness}
+                  onChange={(e) => setBevelThickness(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  ベベルサイズ / Bevel Size: {bevelSize.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={bevelSize}
+                  onChange={(e) => setBevelSize(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  ベベルオフセット / Bevel Offset: {bevelOffset.toFixed(3)}
+                </label>
+                <input
+                  type="range"
+                  min="-0.1"
+                  max="0.1"
+                  step="0.001"
+                  value={bevelOffset}
+                  onChange={(e) => setBevelOffset(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm">
+                  ベベル分割数 / Bevel Segments: {bevelSegments}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="1"
+                  value={bevelSegments}
+                  onChange={(e) => setBevelSegments(parseInt(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+            </div>
+            
+            {/* Material Effects */}
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">マテリアル効果 / Material Effects</h3>
+              
+              <div>
+                <label className="block mb-1 text-sm">
+                  メタリック / Metalness: {metalness.toFixed(2)}
                 </label>
                 <input
                   type="range"
@@ -444,7 +555,7 @@ export default function Home() {
 
               <div>
                 <label className="block mb-1 text-sm">
-                  Roughness / 粗さ: {roughness.toFixed(2)}
+                  粗さ / Roughness: {roughness.toFixed(2)}
                 </label>
                 <input
                   type="range"
@@ -459,7 +570,7 @@ export default function Home() {
 
               <div>
                 <label htmlFor="emissive-color" className="block mb-2 text-sm">
-                  Emissive Color / 発光色
+                  発光色 / Emissive Color
                 </label>
                 <input
                   id="emissive-color"
@@ -472,7 +583,7 @@ export default function Home() {
 
               <div>
                 <label className="block mb-1 text-sm">
-                  Emissive Intensity / 発光強度: {emissiveIntensity.toFixed(2)}
+                  発光強度 / Emissive Intensity: {emissiveIntensity.toFixed(2)}
                 </label>
                 <input
                   type="range"
@@ -487,7 +598,7 @@ export default function Home() {
 
               <div>
                 <label htmlFor="texture-select" className="block mb-2 text-sm font-medium">
-                  Texture / テクスチャ
+                  テクスチャ / Texture
                 </label>
                 <select
                   id="texture-select"
@@ -507,11 +618,11 @@ export default function Home() {
             
             {/* Lighting Controls */}
             <div className="space-y-4 border-t pt-4">
-              <h3 className="font-medium">Lighting Controls / ライティング制御</h3>
+              <h3 className="font-medium">ライティング制御 / Lighting Controls</h3>
               
               <div>
                 <label className="block mb-1 text-sm">
-                  Ambient Light / 環境光: {ambientIntensity.toFixed(2)}
+                  環境光 / Ambient Light: {ambientIntensity.toFixed(2)}
                 </label>
                 <input
                   type="range"
@@ -526,7 +637,7 @@ export default function Home() {
 
               <div>
                 <label className="block mb-1 text-sm">
-                  Main Light / メインライト: {mainLightIntensity.toFixed(2)}
+                  メインライト / Main Light: {mainLightIntensity.toFixed(2)}
                 </label>
                 <input
                   type="range"
@@ -541,7 +652,7 @@ export default function Home() {
 
               <div>
                 <label className="block mb-1 text-sm">
-                  Side Light / サイドライト: {sideLightIntensity.toFixed(2)}
+                  サイドライト / Side Light: {sideLightIntensity.toFixed(2)}
                 </label>
                 <input
                   type="range"
@@ -555,137 +666,18 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Text3D Parameters */}
-            <div className="space-y-4 border-t pt-4">
-              <h3 className="font-medium">3D Parameters</h3>
-              
-              <div>
-                <label className="block mb-1 text-sm">
-                  Size / サイズ: {size.toFixed(2)}
-                </label>
-                <input
-                  type="range"
-                  min="0.1"
-                  max="3"
-                  step="0.1"
-                  value={size}
-                  onChange={(e) => setSize(parseFloat(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm">
-                  Height (Depth) / 高さ（奥行き）: {height.toFixed(2)}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="10"
-                  step="0.1"
-                  value={height}
-                  onChange={(e) => setHeight(parseFloat(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm">
-                  Curve Segments / カーブ分割数: {curveSegments}
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="20"
-                  step="1"
-                  value={curveSegments}
-                  onChange={(e) => setCurveSegments(parseInt(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label className="flex items-center space-x-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={bevelEnabled}
-                    onChange={(e) => setBevelEnabled(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <span>Bevel Enabled / ベベル有効</span>
-                </label>
-              </div>
-
-              {bevelEnabled && (
-                <>
-                  <div>
-                    <label className="block mb-1 text-sm">
-                      Bevel Thickness / ベベル厚さ: {bevelThickness.toFixed(3)}
-                    </label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.001"
-                      value={bevelThickness}
-                      onChange={(e) => setBevelThickness(parseFloat(e.target.value))}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block mb-1 text-sm">
-                      Bevel Size / ベベルサイズ: {bevelSize.toFixed(2)}
-                    </label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.01"
-                      value={bevelSize}
-                      onChange={(e) => setBevelSize(parseFloat(e.target.value))}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block mb-1 text-sm">
-                      Bevel Offset / ベベルオフセット: {bevelOffset.toFixed(3)}
-                    </label>
-                    <input
-                      type="range"
-                      min="-0.1"
-                      max="0.1"
-                      step="0.001"
-                      value={bevelOffset}
-                      onChange={(e) => setBevelOffset(parseFloat(e.target.value))}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block mb-1 text-sm">
-                      Bevel Segments / ベベル分割数: {bevelSegments}
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      step="1"
-                      value={bevelSegments}
-                      onChange={(e) => setBevelSegments(parseInt(e.target.value))}
-                      className="w-full"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-            
             {/* JSON Settings */}
             <div className="space-y-4 border-t pt-4">
-              <h3 className="font-medium">Settings (JSON) / 設定（JSON）</h3>
+              <button
+                onClick={() => setIsJsonOpen(!isJsonOpen)}
+                className="flex items-center justify-between w-full text-left"
+              >
+                <h3 className="font-medium">設定（JSON） / Settings (JSON)</h3>
+                <span className="text-lg">{isJsonOpen ? '−' : '+'}</span>
+              </button>
               
-              <textarea
+              {isJsonOpen && (
+                <textarea
                 value={JSON.stringify({
                   text,
                   color,
@@ -742,6 +734,7 @@ export default function Home() {
                 className="w-full h-32 px-3 py-2 bg-white border border-gray-300 rounded-lg font-mono text-xs overflow-auto resize-none focus:outline-none focus:border-blue-500"
                 spellCheck={false}
               />
+              )}
             </div>
           </div>
         </div>
