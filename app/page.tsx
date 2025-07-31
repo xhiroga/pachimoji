@@ -38,7 +38,7 @@ export default function Home() {
   const fonts = [
     { name: 'ゴシック（Noto Sans）', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json' },
     { name: '筆文字（玉ねぎ楷書「激」）', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
-    { name: '装甲明朝', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json' },
+    { name: '明朝体（装甲明朝）', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json' },
   ]
 
   const textures = [
@@ -64,7 +64,7 @@ export default function Home() {
         ambientIntensity: 1,
         mainLightIntensity: 20,
         sideLightIntensity: 20,
-        size: 1,
+        size: 1.4,
         height: 1,
         curveSegments: 12,
         bevelEnabled: true,
