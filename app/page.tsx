@@ -32,6 +32,7 @@ export default function Home() {
   const [bevelSize, setBevelSize] = useState(0.1) // デフォルト0.1に変更
   const [bevelOffset, setBevelOffset] = useState(0)
   const [bevelSegments, setBevelSegments] = useState(5)
+  const [letterSpacing, setLetterSpacing] = useState(0.9)
 
   const fonts = [
     { name: 'ゴシック（Noto Sans）', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json' },
@@ -69,7 +70,8 @@ export default function Home() {
         bevelSize: 0.1,
         bevelOffset: 0,
         bevelSegments: 5,
-        selectedTexture: 'none'
+        selectedTexture: 'none',
+        letterSpacing: 0.9
       }
     },
     {
@@ -94,7 +96,8 @@ export default function Home() {
         bevelSize: 0.15,
         bevelOffset: 0,
         bevelSegments: 5,
-        selectedTexture: 'none'
+        selectedTexture: 'none',
+        letterSpacing: 0.9
       }
     },
     {
@@ -119,7 +122,8 @@ export default function Home() {
         bevelSize: 0.08,
         bevelOffset: 0,
         bevelSegments: 8,
-        selectedTexture: 'metal'
+        selectedTexture: 'metal',
+        letterSpacing: 0.8
       }
     }
   ]
@@ -156,6 +160,7 @@ export default function Home() {
     setBevelOffset(preset.settings.bevelOffset)
     setBevelSegments(preset.settings.bevelSegments)
     setSelectedTexture(preset.settings.selectedTexture)
+    setLetterSpacing(preset.settings.letterSpacing)
   }, [])
 
   // Text3Dコンテンツのみ（Canvasの外）
@@ -177,6 +182,7 @@ export default function Home() {
     emissive,
     emissiveIntensity,
     selectedTexture,
+    letterSpacing,
   }: {
     text: string
     color: string
@@ -195,8 +201,10 @@ export default function Home() {
     emissive: string
     emissiveIntensity: number
     selectedTexture: string
+    letterSpacing: number
   }) => {
     const sanitized = text.replace(/\n/g, ' ')
+    const characters = [...sanitized] // 文字列を1文字ずつの配列に分解
     
     // テクスチャの読み込み（全テクスチャを事前に読み込み）
     const selectedTextureInfo = textures.find(t => t.value === selectedTexture)
@@ -221,48 +229,57 @@ export default function Home() {
     // 選択されたテクスチャを取得
     const texture = selectedTextureInfo?.path ? loadedTextures[selectedTextureInfo.path] : null
     
+    // 文字間隔の計算
+    const spacing = size * letterSpacing
+    
     return (
       <Center>
-        <Text3D
-          font={fontPath}
-          size={size}
-          height={height}
-          curveSegments={curveSegments}
-          bevelEnabled={bevelEnabled}
-          bevelThickness={bevelThickness}
-          bevelSize={bevelSize}
-          bevelOffset={bevelOffset}
-          bevelSegments={bevelSegments}
-        >
-          {sanitized}
-          {/* Try JSX approach for multi-material */}
-          <meshStandardMaterial
-            attach={(parent) => {
-              // Create materials array and assign to parent
-              const frontMaterial = new THREE.MeshStandardMaterial({
-                color: new THREE.Color(color),
-                metalness: metalness,
-                roughness: roughness,
-                emissive: new THREE.Color(emissive),
-                emissiveIntensity: emissiveIntensity,
-                map: texture, // テクスチャを適用
-              })
-              const sideMaterial = new THREE.MeshStandardMaterial({
-                color: new THREE.Color(bevelColor),
-                metalness: metalness * 1.2,
-                roughness: roughness * 0.8,
-                emissive: new THREE.Color(emissive),
-                emissiveIntensity: emissiveIntensity * 0.5,
-              })
-              parent.material = [frontMaterial, sideMaterial]
-              return () => {
-                // Cleanup
-                frontMaterial.dispose()
-                sideMaterial.dispose()
-              }
-            }}
-          />
-        </Text3D>
+        <group>
+          {characters.map((char, index) => (
+            <Text3D
+              key={index}
+              font={fontPath}
+              size={size}
+              height={height}
+              curveSegments={curveSegments}
+              bevelEnabled={bevelEnabled}
+              bevelThickness={bevelThickness}
+              bevelSize={bevelSize}
+              bevelOffset={bevelOffset}
+              bevelSegments={bevelSegments}
+              position={[(index - (characters.length - 1) / 2) * spacing, 0, 0]}
+            >
+              {char}
+              {/* Try JSX approach for multi-material */}
+              <meshStandardMaterial
+                attach={(parent) => {
+                  // Create materials array and assign to parent
+                  const frontMaterial = new THREE.MeshStandardMaterial({
+                    color: new THREE.Color(color),
+                    metalness: metalness,
+                    roughness: roughness,
+                    emissive: new THREE.Color(emissive),
+                    emissiveIntensity: emissiveIntensity,
+                    map: texture, // テクスチャを適用
+                  })
+                  const sideMaterial = new THREE.MeshStandardMaterial({
+                    color: new THREE.Color(bevelColor),
+                    metalness: metalness * 1.2,
+                    roughness: roughness * 0.8,
+                    emissive: new THREE.Color(emissive),
+                    emissiveIntensity: emissiveIntensity * 0.5,
+                  })
+                  parent.material = [frontMaterial, sideMaterial]
+                  return () => {
+                    // Cleanup
+                    frontMaterial.dispose()
+                    sideMaterial.dispose()
+                  }
+                }}
+              />
+            </Text3D>
+          ))}
+        </group>
       </Center>
     )
   })
@@ -278,7 +295,8 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 h-[600px] bg-white rounded-lg overflow-hidden border border-gray-200">
             <Canvas
-              camera={{ position: [0, 0, 5] }}
+              orthographic
+              camera={{ position: [0, 0, 5], zoom: 100 }}
               gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
               style={{ width: '100%', height: '100%' }}
             >
@@ -309,6 +327,7 @@ export default function Home() {
                 emissive={emissive}
                 emissiveIntensity={emissiveIntensity}
                 selectedTexture={selectedTexture}
+                letterSpacing={letterSpacing}
               />
               <OrbitControls enablePan={false} enableZoom enableRotate />
             </Canvas>
@@ -562,6 +581,21 @@ export default function Home() {
               </div>
 
               <div>
+                <label className="block mb-1 text-sm">
+                  Letter Spacing / 文字間隔: {letterSpacing.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0.3"
+                  max="2.0"
+                  step="0.05"
+                  value={letterSpacing}
+                  onChange={(e) => setLetterSpacing(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
                 <label className="flex items-center space-x-2 text-sm">
                   <input
                     type="checkbox"
@@ -663,7 +697,8 @@ export default function Home() {
                   bevelSize,
                   bevelOffset,
                   bevelSegments,
-                  selectedTexture
+                  selectedTexture,
+                  letterSpacing
                 }, null, 2)}
                 onChange={(e) => {
                   try {
@@ -690,6 +725,7 @@ export default function Home() {
                     if (settings.bevelOffset !== undefined) setBevelOffset(settings.bevelOffset)
                     if (settings.bevelSegments !== undefined) setBevelSegments(settings.bevelSegments)
                     if (settings.selectedTexture !== undefined) setSelectedTexture(settings.selectedTexture)
+                    if (settings.letterSpacing !== undefined) setLetterSpacing(settings.letterSpacing)
                   } catch (error) {
                     // Invalid JSON - ignore
                   }
@@ -711,7 +747,8 @@ export default function Home() {
                 <div className="mb-4">
                   <div className="h-32 bg-white rounded border border-gray-300 flex items-center justify-center relative overflow-hidden">
                     <Canvas
-                      camera={{ position: [0, 0, 4] }}
+                      orthographic
+                      camera={{ position: [0, 0, 4], zoom: 80 }}
                       gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
                       style={{ width: '100%', height: '100%' }}
                     >
@@ -737,6 +774,7 @@ export default function Home() {
                         emissive={preset.settings.emissive}
                         emissiveIntensity={preset.settings.emissiveIntensity}
                         selectedTexture={preset.settings.selectedTexture}
+                        letterSpacing={preset.settings.letterSpacing}
                       />
                       <OrbitControls enablePan={false} enableZoom={false} enableRotate={false} />
                     </Canvas>
