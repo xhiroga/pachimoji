@@ -39,8 +39,8 @@ export default function Home() {
 
   const fonts = [
     { name: 'ゴシック（Noto Sans）- 約16,000字', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json' },
-    { name: '筆文字（玉ねぎ楷書「激」）- 約3,800字', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
     { name: '明朝体（装甲明朝）- 約7,900字', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json' },
+    { name: '筆文字（玉ねぎ楷書「激」）- 約3,800字', path: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json' },
   ]
 
   const textures = [
@@ -79,33 +79,6 @@ export default function Home() {
       }
     },
     {
-      name: '激熱！筆文字',
-      text: '激アツ!',
-      image: '/images/sample-kaisho.png',
-      settings: {
-        color: '#FF0000',
-        bevelColor: '#fbff24',
-        selectedFont: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json',
-        metalness: 0.8,
-        roughness: 0.4,
-        emissive: '#ff0000',
-        emissiveIntensity: 0.34,
-        ambientIntensity: 1.5,
-        mainLightIntensity: 25,
-        sideLightIntensity: 15,
-        size: 2.0,
-        height: 0.7,
-        curveSegments: 9,
-        bevelEnabled: true,
-        bevelThickness: 0.214,
-        bevelSize: 0.22,
-        bevelOffset: -0.022,
-        bevelSegments: 7,
-        selectedTexture: 'none',
-        letterSpacing: 1.15
-      }
-    },
-    {
       name: '高級感＆明朝',
       text: '新台入替',
       image: '/images/sample-mincho.png',
@@ -130,6 +103,33 @@ export default function Home() {
         bevelSegments: 8,
         selectedTexture: 'none',
         letterSpacing: 1.25
+      }
+    },
+    {
+      name: '激熱！筆文字',
+      text: '激アツ!',
+      image: '/images/sample-kaisho.png',
+      settings: {
+        color: '#FF0000',
+        bevelColor: '#fbff24',
+        selectedFont: 'https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json',
+        metalness: 0.8,
+        roughness: 0.4,
+        emissive: '#ff0000',
+        emissiveIntensity: 0.34,
+        ambientIntensity: 1.5,
+        mainLightIntensity: 25,
+        sideLightIntensity: 15,
+        size: 2.0,
+        height: 0.7,
+        curveSegments: 9,
+        bevelEnabled: true,
+        bevelThickness: 0.214,
+        bevelSize: 0.22,
+        bevelOffset: -0.022,
+        bevelSegments: 7,
+        selectedTexture: 'none',
+        letterSpacing: 1.15
       }
     }
   ]
