@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Canvas } from '@react-three/fiber'
 import { Text3D, Center, OrbitControls, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+import { sendGAEvent } from '@/utils/analytics'
 
 export default function Home() {
   const [text, setText] = useState('全国最大級')
@@ -143,19 +144,15 @@ export default function Home() {
     link.click()
     
     // Google Analytics イベント送信
-    if (typeof window !== 'undefined' && 'gtag' in window) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const gtag = (window as { gtag: (command: string, eventName: string, parameters: Record<string, any>) => void }).gtag
-      gtag('event', 'download_png', {
-        event_category: 'engagement',
-        event_label: '3d_text_png'
-      })
-    }
+    sendGAEvent('download_png', {
+      event_category: 'engagement',
+      event_label: '3d_text_png'
+    })
   }, [])
 
   // プリセットを適用する関数
   const applyPreset = useCallback((preset: typeof presets[0]) => {
-    setText(preset.text)
+    // テキストは変更しない
     setColor(preset.settings.color)
     setBevelColor(preset.settings.bevelColor)
     setSelectedFont(preset.settings.selectedFont)
@@ -866,14 +863,10 @@ export default function Home() {
                     video.currentTime = 0
                     video.play()
                     // Google Analytics イベント送信
-                    if (typeof window !== 'undefined' && 'gtag' in window) {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const gtag = (window as { gtag: (command: string, eventName: string, parameters: Record<string, any>) => void }).gtag
-                      gtag('event', 'sawara_dog_video_play', {
-                        event_category: 'engagement',
-                        event_label: 'footer_video'
-                      })
-                    }
+                    sendGAEvent('sawara_dog_video_play', {
+                      event_category: 'engagement',
+                      event_label: 'footer_video'
+                    })
                   }
                   // 動画が終わったら停止
                   video.onended = () => {
