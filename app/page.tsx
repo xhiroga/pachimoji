@@ -141,6 +141,16 @@ export default function Home() {
     link.download = '3dtext.png'
     link.href = canvas.toDataURL('image/png')
     link.click()
+    
+    // Google Analytics イベント送信
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const gtag = (window as { gtag: (command: string, eventName: string, parameters: Record<string, any>) => void }).gtag
+      gtag('event', 'download_png', {
+        event_category: 'engagement',
+        event_label: '3d_text_png'
+      })
+    }
   }, [])
 
   // プリセットを適用する関数
@@ -409,7 +419,7 @@ export default function Home() {
               onClick={handleDownload}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-full"
             >
-              PNG ダウンロード
+              画像ダウンロード（透過PNG）
             </button>
             
             <div>
@@ -857,6 +867,7 @@ export default function Home() {
                     video.play()
                     // Google Analytics イベント送信
                     if (typeof window !== 'undefined' && 'gtag' in window) {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       const gtag = (window as { gtag: (command: string, eventName: string, parameters: Record<string, any>) => void }).gtag
                       gtag('event', 'sawara_dog_video_play', {
                         event_category: 'engagement',
