@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, memo } from 'react'
+import Image from 'next/image'
 import { Canvas } from '@react-three/fiber'
 import { Text3D, Center, OrbitControls, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
@@ -339,10 +340,12 @@ export default function Home() {
       <div className="min-h-screen bg-white text-gray-900">
         <div className="container mx-auto p-8">
         <div className="mb-8">
-          <img
+          <Image
             src="/images/logo.png"
             alt="パチ文字メーカー"
-            className="h-12"
+            width={120}
+            height={48}
+            className="h-12 w-auto"
           />
         </div>
         
@@ -771,7 +774,7 @@ export default function Home() {
                     if (settings.bevelSegments !== undefined) setBevelSegments(settings.bevelSegments)
                     if (settings.selectedTexture !== undefined) setSelectedTexture(settings.selectedTexture)
                     if (settings.letterSpacing !== undefined) setLetterSpacing(settings.letterSpacing)
-                  } catch (error) {
+                  } catch {
                     // Invalid JSON - ignore
                   }
                 }}
@@ -792,9 +795,11 @@ export default function Home() {
                 <h3 className="text-lg font-bold mb-2">{preset.name}</h3>
                 <div className="mb-4">
                   <div className="h-32 bg-white rounded border border-gray-300 flex items-center justify-center relative overflow-hidden">
-                    <img
+                    <Image
                       src={preset.image}
                       alt={preset.name}
+                      width={200}
+                      height={128}
                       className="w-full h-full object-contain"
                     />
                   </div>
@@ -851,8 +856,9 @@ export default function Home() {
                     video.currentTime = 0
                     video.play()
                     // Google Analytics イベント送信
-                    if (typeof window !== 'undefined' && (window as any).gtag) {
-                      (window as any).gtag('event', 'sawara_dog_video_play', {
+                    if (typeof window !== 'undefined' && 'gtag' in window) {
+                      const gtag = (window as { gtag: (command: string, eventName: string, parameters: Record<string, any>) => void }).gtag
+                      gtag('event', 'sawara_dog_video_play', {
                         event_category: 'engagement',
                         event_label: 'footer_video'
                       })
