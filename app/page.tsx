@@ -2,9 +2,10 @@
 
 import { useState, useCallback, memo } from 'react'
 import Image from 'next/image'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useLoader } from '@react-three/fiber'
 import { Text3D, Center, OrbitControls, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { sendGAEvent } from '@/utils/analytics'
 
 export default function Home() {
@@ -34,7 +35,7 @@ export default function Home() {
   const [bevelSize, setBevelSize] = useState(0.1) // デフォルト0.1に変更
   const [bevelOffset, setBevelOffset] = useState(0)
   const [bevelSegments, setBevelSegments] = useState(5)
-  const [letterSpacing, setLetterSpacing] = useState(1.25)
+  const [letterSpacing, setLetterSpacing] = useState(1.0)
   const [isJsonOpen, setIsJsonOpen] = useState(false)
 
   const fonts = [
@@ -66,7 +67,7 @@ export default function Home() {
         ambientIntensity: 1,
         mainLightIntensity: 20,
         sideLightIntensity: 20,
-        size: 1.4,
+        size: 1.0,
         height: 1,
         curveSegments: 12,
         bevelEnabled: true,
@@ -75,7 +76,7 @@ export default function Home() {
         bevelOffset: 0,
         bevelSegments: 5,
         selectedTexture: 'none',
-        letterSpacing: 1.25
+        letterSpacing: 1.0
       }
     },
     {
@@ -93,16 +94,16 @@ export default function Home() {
         ambientIntensity: 2,
         mainLightIntensity: 30,
         sideLightIntensity: 25,
-        size: 1.7,
+        size: 1.0,
         height: 2.1,
         curveSegments: 16,
         bevelEnabled: true,
         bevelThickness: 0.19,
-        bevelSize: 0.1,
+        bevelSize: 0.06,
         bevelOffset: 0.001,
         bevelSegments: 8,
         selectedTexture: 'none',
-        letterSpacing: 1.25
+        letterSpacing: 1.0
       }
     },
     {
@@ -120,16 +121,16 @@ export default function Home() {
         ambientIntensity: 1.5,
         mainLightIntensity: 25,
         sideLightIntensity: 15,
-        size: 2.0,
+        size: 1.0,
         height: 0.7,
         curveSegments: 9,
         bevelEnabled: true,
         bevelThickness: 0.214,
-        bevelSize: 0.22,
+        bevelSize: 0.10,
         bevelOffset: -0.022,
         bevelSegments: 7,
         selectedTexture: 'none',
-        letterSpacing: 1.15
+        letterSpacing: 1.0
       }
     }
   ]
@@ -218,6 +219,9 @@ export default function Home() {
     const sanitized = text.replace(/\n/g, ' ')
     const characters = [...sanitized] // 文字列を1文字ずつの配列に分解
     
+    // フォントデータを読み込み（グリフ情報を取得するため）
+    const font = useLoader(FontLoader, fontPath)
+    
     // テクスチャの読み込み（全テクスチャを事前に読み込み）
     const selectedTextureInfo = textures.find(t => t.value === selectedTexture)
     const texturePaths = [
@@ -241,8 +245,36 @@ export default function Home() {
     // 選択されたテクスチャを取得
     const texture = selectedTextureInfo?.path ? loadedTextures[selectedTextureInfo.path] : null
     
-    // 文字間隔の計算
-    const spacing = size * letterSpacing
+    // 各文字の位置をグリフ情報を使って計算
+    const charPositions: number[] = []
+    let currentX = 0
+    
+    // フォントのユニットサイズ（通常は1000-2048程度）を推定
+    // Three.jsのフォントは通常、haの値が1000単位程度で記録されている
+    const fontScale = size / 1000
+    
+    characters.forEach((_, index) => {
+      if (index > 0) {
+        const prevChar = characters[index - 1]
+        const prevGlyph = font.data.glyphs?.[prevChar]
+        
+        if (prevGlyph && typeof prevGlyph.ha === 'number') {
+          // 前の文字の水平アドバンスを適切にスケール
+          const advance = prevGlyph.ha * fontScale
+          // letterSpacingは追加間隔として適用（1.0 = 基本間隔、1.25 = 基本 + 25%）
+          const additionalSpacing = (letterSpacing - 1.0) * size * 0.5
+          currentX += advance + additionalSpacing
+        } else {
+          // グリフが見つからない場合はデフォルト値を使用
+          currentX += size * letterSpacing
+        }
+      }
+      charPositions.push(currentX)
+    })
+    
+    // 全体を中央揃えにするためのオフセット
+    const totalWidth = charPositions[charPositions.length - 1] || 0
+    const centerOffset = totalWidth / 2
     
     return (
       <Center>
@@ -259,7 +291,7 @@ export default function Home() {
               bevelSize={bevelSize}
               bevelOffset={bevelOffset}
               bevelSegments={bevelSegments}
-              position={[(index - (characters.length - 1) / 2) * spacing, 0, 0]}
+              position={[charPositions[index] - centerOffset, 0, 0]}
             >
               {char}
               {/* Try JSX approach for multi-material */}
