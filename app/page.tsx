@@ -887,31 +887,43 @@ export default function Home() {
           </div>
           <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
             <span>Made by</span>
-            <video
-              ref={(video) => {
-                if (video) {
-                  video.onclick = () => {
-                    // 最初から再生
-                    video.currentTime = 0
-                    video.play()
-                    // Google Analytics イベント送信
-                    sendGAEvent('sawara_dog_video_play', {
-                      event_category: 'engagement',
-                      event_label: 'footer_video'
-                    })
-                  }
-                  // 動画が終わったら停止
-                  video.onended = () => {
-                    video.pause()
-                  }
-                }
+            <a
+              href="https://sawara.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                // Google Analytics イベント送信
+                sendGAEvent('sawara_dog_link_click', {
+                  event_category: 'engagement',
+                  event_label: 'footer_link'
+                })
               }}
-              className="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
-              muted
-              playsInline
             >
-              <source src="/images/logo.mp4" type="video/mp4" />
-            </video>
+              <video
+                ref={(video) => {
+                  if (video) {
+                    // ページ読み込み時に1回再生
+                    const playOnLoad = () => {
+                      video.currentTime = 0
+                      video.play()
+                    }
+                    
+                    // 少し遅延してから再生（フォントなどの読み込みを待つ）
+                    setTimeout(playOnLoad, 1000)
+                    
+                    // 動画が終わったら停止
+                    video.onended = () => {
+                      video.pause()
+                    }
+                  }
+                }}
+                className="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+                muted
+                playsInline
+              >
+                <source src="/images/logo.mp4" type="video/mp4" />
+              </video>
+            </a>
           </div>
         </footer>
         </div>

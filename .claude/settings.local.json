@@ -27,7 +27,9 @@
       "Bash(open \"http://localhost:3000\")",
       "mcp__ide__executeCode",
       "Bash(cp:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "mcp__serena__find_symbol",
+      "mcp__serena__search_for_pattern"
     ]
   },
   "enableAllProjectMcpServers": true,
