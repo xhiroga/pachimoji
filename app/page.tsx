@@ -36,6 +36,7 @@ export default function Home() {
   const [bevelOffset, setBevelOffset] = useState(0)
   const [bevelSegments, setBevelSegments] = useState(5)
   const [letterSpacing, setLetterSpacing] = useState(1.0)
+  const [isVertical, setIsVertical] = useState(false)
   const [isJsonOpen, setIsJsonOpen] = useState(false)
 
   const fonts = [
@@ -196,6 +197,7 @@ export default function Home() {
     emissiveIntensity,
     selectedTexture,
     letterSpacing,
+    isVertical,
   }: {
     text: string
     color: string
@@ -215,6 +217,7 @@ export default function Home() {
     emissiveIntensity: number
     selectedTexture: string
     letterSpacing: number
+    isVertical: boolean
   }) => {
     const sanitized = text.replace(/\n/g, ' ')
     const characters = [...sanitized] // 文字列を1文字ずつの配列に分解
@@ -245,9 +248,9 @@ export default function Home() {
     // 選択されたテクスチャを取得
     const texture = selectedTextureInfo?.path ? loadedTextures[selectedTextureInfo.path] : null
     
-    // 各文字の位置をグリフ情報を使って計算
+    // 縦書き・横書きの文字位置計算
     const charPositions: number[] = []
-    let currentX = 0
+    let currentPos = 0
     
     // フォントのユニットサイズ（通常は1000-2048程度）を推定
     // Three.jsのフォントは通常、haの値が1000単位程度で記録されている
@@ -258,41 +261,50 @@ export default function Home() {
         const prevChar = characters[index - 1]
         const prevGlyph = font.data.glyphs?.[prevChar]
         
-        if (prevGlyph && typeof prevGlyph.ha === 'number') {
-          // 前の文字の水平アドバンスを適切にスケール
+        if (isVertical) {
+          currentPos += size * letterSpacing * 1.4
+        } else if (prevGlyph && typeof prevGlyph.ha === 'number') {
+          // 横書きは前の文字の水平アドバンスを適切にスケール
           const advance = prevGlyph.ha * fontScale
           // letterSpacingは追加間隔として適用（1.0 = 基本間隔、1.25 = 基本 + 25%）
           const additionalSpacing = (letterSpacing - 1.0) * size * 0.5
-          currentX += advance + additionalSpacing
+          currentPos += advance + additionalSpacing
         } else {
           // グリフが見つからない場合はデフォルト値を使用
-          currentX += size * letterSpacing
+          currentPos += size * letterSpacing
         }
       }
-      charPositions.push(currentX)
+      charPositions.push(currentPos)
     })
     
     // 全体を中央揃えにするためのオフセット
-    const totalWidth = charPositions[charPositions.length - 1] || 0
-    const centerOffset = totalWidth / 2
+    const totalLength = charPositions[charPositions.length - 1] || 0
+    const centerOffset = totalLength / 2
+    
+    // 縦書きモード（ベータ版）
+    // 注意：半角英数字の回転は基準点の問題で一旦保留
     
     return (
       <Center>
         <group>
-          {characters.map((char, index) => (
-            <Text3D
-              key={index}
-              font={fontPath}
-              size={size}
-              height={height}
-              curveSegments={curveSegments}
-              bevelEnabled={bevelEnabled}
-              bevelThickness={bevelThickness}
-              bevelSize={bevelSize}
-              bevelOffset={bevelOffset}
-              bevelSegments={bevelSegments}
-              position={[charPositions[index] - centerOffset, 0, 0]}
-            >
+          {characters.map((char, index) => {
+            const posX = isVertical ? 0 : charPositions[index] - centerOffset
+            const posY = isVertical ? -(charPositions[index] - centerOffset) : 0
+            
+            return (
+              <Text3D
+                key={index}
+                font={fontPath}
+                size={size}
+                height={height}
+                curveSegments={curveSegments}
+                bevelEnabled={bevelEnabled}
+                bevelThickness={bevelThickness}
+                bevelSize={bevelSize}
+                bevelOffset={bevelOffset}
+                bevelSegments={bevelSegments}
+                position={[posX, posY, 0]}
+              >
               {char}
               {/* Try JSX approach for multi-material */}
               <meshStandardMaterial
@@ -322,7 +334,8 @@ export default function Home() {
                 }}
               />
             </Text3D>
-          ))}
+            )
+          })}
         </group>
       </Center>
     )
@@ -424,6 +437,7 @@ export default function Home() {
                 emissiveIntensity={emissiveIntensity}
                 selectedTexture={selectedTexture}
                 letterSpacing={letterSpacing}
+                isVertical={isVertical}
               />
               <OrbitControls enablePan={false} enableZoom enableRotate />
             </Canvas>
@@ -482,6 +496,34 @@ export default function Home() {
                 onChange={(e) => setLetterSpacing(parseFloat(e.target.value))}
                 className="w-full"
               />
+            </div>
+            
+            <div>
+              <label className="block mb-2 text-sm font-medium">
+                文字方向 / Text Direction
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsVertical(false)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    !isVertical 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  横書き
+                </button>
+                <button
+                  onClick={() => setIsVertical(true)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isVertical 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  縦書き（β）
+                </button>
+              </div>
             </div>
             
             <div>
@@ -785,7 +827,8 @@ export default function Home() {
                   bevelOffset,
                   bevelSegments,
                   selectedTexture,
-                  letterSpacing
+                  letterSpacing,
+                  isVertical
                 }, null, 2)}
                 onChange={(e) => {
                   try {
@@ -813,6 +856,7 @@ export default function Home() {
                     if (settings.bevelSegments !== undefined) setBevelSegments(settings.bevelSegments)
                     if (settings.selectedTexture !== undefined) setSelectedTexture(settings.selectedTexture)
                     if (settings.letterSpacing !== undefined) setLetterSpacing(settings.letterSpacing)
+                    if (settings.isVertical !== undefined) setIsVertical(settings.isVertical)
                   } catch {
                     // Invalid JSON - ignore
                   }
