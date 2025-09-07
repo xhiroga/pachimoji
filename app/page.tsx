@@ -163,14 +163,14 @@ export default function Home() {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement | null;
     if (!canvas) return;
     const link = document.createElement("a");
-    link.download = "3dtext.png";
+    link.download = "pachimoji.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
 
     // Google Analytics イベント送信
     sendGAEvent("download_png", {
       event_category: "engagement",
-      event_label: "3d_text_png",
+      event_label: "pachimoji_png",
     });
   }, []);
 
@@ -383,7 +383,7 @@ export default function Home() {
     alternateName: "3D Text Maker",
     description:
       "パチンコでよく見る豪華な文字を簡単に作成できる無料のオンライン3Dツール。チラシ、ポスター、SNS投稿用の派手な文字デザインが誰でも簡単に作れます。",
-    url: "https://3dtext.sawara.dev",
+    url: "https://pachimoji.sawara.dev",
     applicationCategory: "DesignApplication",
     operatingSystem: "Web Browser",
     offers: {
@@ -404,7 +404,7 @@ export default function Home() {
       "ライティング制御",
       "PNG書き出し",
     ],
-    screenshot: "https://3dtext.sawara.dev/og-image.png",
+    screenshot: "https://pachimoji.sawara.dev/og-image.png",
     softwareVersion: "1.0",
     datePublished: "2025-01-31",
     dateModified: "2025-01-31",

@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: "パチ文字メーカー | 3D文字作成ツール",
     description:
       "パチンコでよく見る豪華な文字を簡単に作成できる無料のオンライン3Dツール。チラシ、ポスター、SNS投稿用の派手な文字デザインが誰でも簡単に作れます。",
-    url: "https://3dtext.sawara.dev",
+    url: "https://pachimoji.sawara.dev",
     siteName: "パチ文字メーカー",
     images: [
       {
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     creator: "@pachimoji",
   },
   alternates: {
-    canonical: "https://3dtext.sawara.dev",
+    canonical: "https://pachimoji.sawara.dev",
   },
   category: "Design Tools",
   classification: "3D Text Editor",

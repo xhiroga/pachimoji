@@ -1,4 +1,4 @@
-[![パチ文字メーカー](./public/images/logo.png)](https://3dtext.sawara.dev/)
+[![パチ文字メーカー](./public/images/logo.png)](https://pachimoji.sawara.dev/)
 
 テキストを3Dのパチンコ風の文字に変換する無料のWebアプリです。
 
