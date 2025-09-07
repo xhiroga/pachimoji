@@ -1077,6 +1077,28 @@ export default function Home() {
                   <source src="/images/logo.mp4" type="video/mp4" />
                 </video>
               </a>
+              <span>on</span>
+              <a
+                href="https://github.com/xhiroga/pachimoji"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity"
+                onClick={() => {
+                  // Google Analytics イベント送信
+                  sendGAEvent("github_link_click", {
+                    event_category: "engagement",
+                    event_label: "footer_github_link",
+                  });
+                }}
+              >
+                <Image
+                  src="/images/github-mark.svg"
+                  alt="GitHub"
+                  width={20}
+                  height={20}
+                  className="inline-block"
+                />
+              </a>
             </div>
           </footer>
         </div>
