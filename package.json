@@ -8,6 +8,9 @@
     "export": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "deploy": "next build && echo 'Static files generated in ./dist directory'",
     "sync-fonts": "dotenv -- aws s3 sync ./fonts s3://$R2_BUCKET_NAME/fonts --endpoint-url $R2_ENDPOINT --delete",
     "sync-fonts:dry-run": "dotenv -- aws s3 sync ./fonts s3://$R2_BUCKET_NAME/fonts --endpoint-url $R2_ENDPOINT --delete --dryrun",
@@ -33,7 +36,9 @@
     "dotenv-cli": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.2",
+    "eslint-config-prettier": "^10.1.8",
     "playwright": "^1.54.1",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

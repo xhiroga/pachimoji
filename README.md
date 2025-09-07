@@ -2,18 +2,6 @@
 
 テキストを3Dのパチンコ風の文字に変換する無料のWebアプリです。
 
-## ローカルで動かすには
-
-```bash
-pnpm run dev
-open localhost:3000
-```
-
-<details>
-<summary>デプロイ</summary>
-
-</details>
-
 ## 開発に参加するには
 
-[CONTRIBUTING.md](./CONTRIBUTING.md)
+お申出ありがとうございます！[CONTRIBUTING.md](./CONTRIBUTING.md)をご参照ください。
