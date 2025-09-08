@@ -22,20 +22,6 @@ pnpm run format
 pnpm run lint
 ```
 
-### 推奨ワークフロー
-
-1. 開発が完了したら、まずフォーマットを実行
-2. 次にリンターを実行して問題を修正
-3. すべてのチェックが通ったらコミット
-
-```bash
-# おすすめの実行順序
-pnpm run format
-pnpm run lint:fix
-git add .
-git commit -m "your commit message"
-```
-
 ## Gitについて
 
 コミットメッセージは[Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716)にゆるく従っています。日本語でも英語でもOKです。
