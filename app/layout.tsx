@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     siteName: "パチ文字メーカー",
     images: [
       {
-        url: "/og-image.png",
+        url: "/api/og",
         width: 1200,
         height: 630,
         alt: "パチ文字メーカー - 3D文字作成ツール",
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     title: "パチ文字メーカー | 3D文字作成ツール",
     description:
       "パチンコでよく見る豪華な文字を簡単に作成できる無料のオンライン3Dツール。チラシ、ポスター、SNS投稿用の派手な文字デザインが誰でも簡単に作れます。",
-    images: ["/og-image.png"],
+    images: ["/api/og"],
     creator: "@pachimoji",
   },
   alternates: {

@@ -17,6 +17,7 @@
     "sync-fonts:list": "dotenv -- aws s3 ls s3://$R2_BUCKET_NAME/fonts/ --endpoint-url $R2_ENDPOINT --recursive"
   },
   "dependencies": {
+    "@cloudflare/pages-plugin-vercel-og": "^0.1.2",
     "@react-three/drei": "^10.5.1",
     "@react-three/fiber": "^9.2.0",
     "@types/three": "^0.178.1",

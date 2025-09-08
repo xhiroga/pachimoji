@@ -38,7 +38,8 @@
       "mcp__serena__find_file",
       "mcp__serena__write_memory",
       "Bash(git log:*)",
-      "Bash(git check-ignore:*)"
+      "Bash(git check-ignore:*)",
+      "Bash(identify:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
