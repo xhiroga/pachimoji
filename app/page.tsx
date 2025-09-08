@@ -1009,8 +1009,14 @@ export default function Home() {
 
           {/* フッター */}
           <footer className="mt-16 pt-8 border-t border-gray-200 text-center">
-            <div className="text-[10px] sm:text-xs text-gray-400 mb-4">
-              本サービスで制作した画像は、<a href="/licenses" className="underline hover:text-gray-600">ライセンス</a>に従う限り、商用・非商用を問わず、自由に使用・複製・改変・頒布・公開できます。
+            <div
+              className="mx-auto mb-4 w-full max-w-screen-lg rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs sm:text-sm text-gray-700"
+              role="note"
+              aria-label="ライセンス情報"
+            >
+              <span className="font-medium">本サービスで制作した画像は</span>、
+              <a href="/licenses" className="underline text-blue-600 hover:text-blue-700">ライセンス</a>
+              に従う限り、商用・非商用を問わず、自由に使用・複製・改変・頒布・公開できます。
             </div>
             <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
               <span>Made by</span>
