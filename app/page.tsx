@@ -1009,34 +1009,10 @@ export default function Home() {
 
           {/* フッター */}
           <footer className="mt-16 pt-8 border-t border-gray-200 text-center">
-            <div className="flex items-center justify-center gap-1 text-xs text-gray-400 mb-4">
-              <span>使用フォント:</span>
-              <a
-                href="https://fonts.google.com/noto/specimen/Noto+Sans+JP"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-gray-600 underline"
-              >
-                Noto Sans JP
-              </a>
-              <span>・</span>
-              <a
-                href="https://booth.pm/ja/items/2929647"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-gray-600 underline"
-              >
-                玉ねぎ楷書「激」
-              </a>
-              <span>・</span>
-              <a
-                href="https://flopdesign.booth.pm/items/1028555"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-gray-600 underline"
-              >
-                装甲明朝
-              </a>
+            <div className="text-[10px] sm:text-xs text-gray-400 mb-4">
+              本サービスで制作した画像は、商用・非商用を問わず、自由に加工・変形・印刷・掲載いただいて構いません（
+              <a href="/licenses" className="underline hover:text-gray-600">ライセンス詳細</a>
+              ）
             </div>
             <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
               <span>Made by</span>
