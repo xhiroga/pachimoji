@@ -3,7 +3,7 @@
 import { useState, useCallback, memo } from "react";
 import Image from "next/image";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { Text3D, Center, OrbitControls, useTexture } from "@react-three/drei";
+import { Text3D, Center, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { sendGAEvent } from "@/utils/analytics";
@@ -24,9 +24,7 @@ export default function Home() {
   // Material Effects
   const [metalness, setMetalness] = useState(1.0);
   const [roughness, setRoughness] = useState(0.6);
-  const [emissive, setEmissive] = useState("#ffffff");
-  const [emissiveIntensity, setEmissiveIntensity] = useState(0);
-  const [selectedTexture, setSelectedTexture] = useState("none");
+  // 自己発光とテクスチャは撤廃（ライト統一のため）
 
   // Lighting Controls
   const [ambientIntensity, setAmbientIntensity] = useState(1.0);
@@ -62,19 +60,7 @@ export default function Home() {
     },
   ];
 
-  const textures = [
-    { name: "None / なし", value: "none", path: null },
-    {
-      name: "Metal Plate / メタルプレート",
-      value: "metal",
-      path: "/textures/metal_plate_diff_1k.jpg",
-    },
-    {
-      name: "Metal Gloss / 金属光沢",
-      value: "gloss",
-      path: "/textures/pierre-bamin-_EzTds6Fo44-unsplash.jpg",
-    },
-  ];
+  // テクスチャ選択は削除
 
   // プリセットスタイル
   const presets = [
@@ -89,8 +75,7 @@ export default function Home() {
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json",
         metalness: 1,
         roughness: 0.6,
-        emissive: "#ffffff",
-        emissiveIntensity: 0,
+        
         ambientIntensity: 1,
         mainLightIntensity: 20,
         sideLightIntensity: 20,
@@ -102,7 +87,7 @@ export default function Home() {
         bevelSize: 0.1,
         bevelOffset: 0,
         bevelSegments: 5,
-        selectedTexture: "none",
+        
         letterSpacing: 1.0,
       },
     },
@@ -117,8 +102,7 @@ export default function Home() {
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json",
         metalness: 0.8,
         roughness: 0.1,
-        emissive: "#ffffff",
-        emissiveIntensity: 0.1,
+        
         ambientIntensity: 2,
         mainLightIntensity: 30,
         sideLightIntensity: 25,
@@ -130,7 +114,7 @@ export default function Home() {
         bevelSize: 0.06,
         bevelOffset: 0.001,
         bevelSegments: 8,
-        selectedTexture: "none",
+        
         letterSpacing: 1.0,
       },
     },
@@ -145,8 +129,7 @@ export default function Home() {
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json",
         metalness: 0.8,
         roughness: 0.4,
-        emissive: "#ff0000",
-        emissiveIntensity: 0.34,
+        
         ambientIntensity: 1.5,
         mainLightIntensity: 25,
         sideLightIntensity: 15,
@@ -158,7 +141,7 @@ export default function Home() {
         bevelSize: 0.1,
         bevelOffset: -0.022,
         bevelSegments: 7,
-        selectedTexture: "none",
+        
         letterSpacing: 1.0,
       },
     },
@@ -194,8 +177,6 @@ export default function Home() {
     setSelectedFont(preset.settings.selectedFont);
     setMetalness(preset.settings.metalness);
     setRoughness(preset.settings.roughness);
-    setEmissive(preset.settings.emissive);
-    setEmissiveIntensity(preset.settings.emissiveIntensity);
     setAmbientIntensity(preset.settings.ambientIntensity);
     setMainLightIntensity(preset.settings.mainLightIntensity);
     setSideLightIntensity(preset.settings.sideLightIntensity);
@@ -207,7 +188,7 @@ export default function Home() {
     setBevelSize(preset.settings.bevelSize);
     setBevelOffset(preset.settings.bevelOffset);
     setBevelSegments(preset.settings.bevelSegments);
-    setSelectedTexture(preset.settings.selectedTexture);
+    
     setLetterSpacing(preset.settings.letterSpacing);
   }, []);
 
@@ -229,9 +210,7 @@ export default function Home() {
       bevelSegments,
       metalness,
       roughness,
-      emissive,
-      emissiveIntensity,
-      selectedTexture,
+      
       letterSpacing,
       isVertical,
     }: {
@@ -250,9 +229,7 @@ export default function Home() {
       bevelSegments: number;
       metalness: number;
       roughness: number;
-      emissive: string;
-      emissiveIntensity: number;
-      selectedTexture: string;
+      
       letterSpacing: number;
       isVertical: boolean;
     }) => {
@@ -262,34 +239,7 @@ export default function Home() {
       // フォントデータを読み込み（グリフ情報を取得するため）
       const font = useLoader(FontLoader, fontPath);
 
-      // テクスチャの読み込み（全テクスチャを事前に読み込み）
-      const selectedTextureInfo = textures.find(
-        (t) => t.value === selectedTexture
-      );
-      const texturePaths = [
-        "/textures/metal_plate_diff_1k.jpg",
-        "/textures/pierre-bamin-_EzTds6Fo44-unsplash.jpg",
-      ];
-
-      // 常に全テクスチャを読み込み（条件なし）
-      const textureArray = useTexture(texturePaths);
-      const loadedTextures: { [key: string]: THREE.Texture } = {};
-
-      texturePaths.forEach((path, index) => {
-        const tex = Array.isArray(textureArray)
-          ? textureArray[index]
-          : textureArray;
-        if (tex) {
-          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-          tex.repeat.set(2, 2);
-          loadedTextures[path] = tex;
-        }
-      });
-
-      // 選択されたテクスチャを取得
-      const texture = selectedTextureInfo?.path
-        ? loadedTextures[selectedTextureInfo.path]
-        : null;
+      // テクスチャは使用しない
 
       // 縦書き・横書きの文字位置計算
       const charPositions: number[] = [];
@@ -357,16 +307,11 @@ export default function Home() {
                           color: new THREE.Color(color),
                           metalness: metalness,
                           roughness: roughness,
-                          emissive: new THREE.Color(emissive),
-                          emissiveIntensity: emissiveIntensity,
-                          map: texture,
                         });
                         const sideMaterial = new THREE.MeshStandardMaterial({
                           color: new THREE.Color(bevelColor),
                           metalness: metalness * 1.2,
                           roughness: roughness * 0.8,
-                          emissive: new THREE.Color(emissive),
-                          emissiveIntensity: emissiveIntensity * 0.5,
                         });
 
                         // シェーダ拡張: ベベル領域をセグメント毎に色分け
@@ -553,9 +498,6 @@ export default function Home() {
                   bevelSegments={bevelSegments}
                   metalness={metalness}
                   roughness={roughness}
-                  emissive={emissive}
-                  emissiveIntensity={emissiveIntensity}
-                  selectedTexture={selectedTexture}
                   letterSpacing={letterSpacing}
                   isVertical={isVertical}
                 />
@@ -839,60 +781,7 @@ export default function Home() {
                   />
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="emissive-color"
-                    className="block mb-2 text-sm"
-                  >
-                    発光色 / Emissive Color
-                  </label>
-                  <input
-                    id="emissive-color"
-                    type="color"
-                    value={emissive}
-                    onChange={(e) => setEmissive(e.target.value)}
-                    className="w-full h-8 bg-white border border-gray-300 rounded-lg cursor-pointer"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    発光強度 / Emissive Intensity:{" "}
-                    {emissiveIntensity.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="2"
-                    step="0.01"
-                    value={emissiveIntensity}
-                    onChange={(e) =>
-                      setEmissiveIntensity(parseFloat(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="texture-select"
-                    className="block mb-2 text-sm font-medium"
-                  >
-                    テクスチャ / Texture
-                  </label>
-                  <select
-                    id="texture-select"
-                    value={selectedTexture}
-                    onChange={(e) => setSelectedTexture(e.target.value)}
-                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-900"
-                  >
-                    {textures.map((texture) => (
-                      <option key={texture.value} value={texture.value}>
-                        {texture.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {/* 自己発光・テクスチャのコントロールは削除 */}
               </div>
 
               {/* Lighting Controls */}
@@ -976,8 +865,6 @@ export default function Home() {
                         selectedFont,
                         metalness,
                         roughness,
-                        emissive,
-                        emissiveIntensity,
                         ambientIntensity,
                         mainLightIntensity,
                         sideLightIntensity,
@@ -989,7 +876,6 @@ export default function Home() {
                         bevelSize,
                         bevelOffset,
                         bevelSegments,
-                        selectedTexture,
                         letterSpacing,
                         isVertical,
                       },
@@ -1014,10 +900,7 @@ export default function Home() {
                           setMetalness(settings.metalness);
                         if (settings.roughness !== undefined)
                           setRoughness(settings.roughness);
-                        if (settings.emissive !== undefined)
-                          setEmissive(settings.emissive);
-                        if (settings.emissiveIntensity !== undefined)
-                          setEmissiveIntensity(settings.emissiveIntensity);
+                        // emissive* は削除
                         if (settings.ambientIntensity !== undefined)
                           setAmbientIntensity(settings.ambientIntensity);
                         if (settings.mainLightIntensity !== undefined)
@@ -1039,8 +922,7 @@ export default function Home() {
                           setBevelOffset(settings.bevelOffset);
                         if (settings.bevelSegments !== undefined)
                           setBevelSegments(settings.bevelSegments);
-                        if (settings.selectedTexture !== undefined)
-                          setSelectedTexture(settings.selectedTexture);
+                        // texture 選択は削除
                         if (settings.letterSpacing !== undefined)
                           setLetterSpacing(settings.letterSpacing);
                         if (settings.isVertical !== undefined)
