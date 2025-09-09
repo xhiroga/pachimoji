@@ -11,10 +11,12 @@ import { sendGAEvent } from "@/utils/analytics";
 export default function Home() {
   const [text, setText] = useState("全国最大級");
   const [color, setColor] = useState("#FFD700"); // ゴールド色
-  // 3段ベベル用の色（1=上段、2=中段、3=下段）
-  const [bevelColor, setBevelColor] = useState("#8B4513"); // 上段（従来のベベル色）
-  const [bevelColor2, setBevelColor2] = useState("#6B3A0F"); // 中段
-  const [bevelColor3, setBevelColor3] = useState("#4E2A0A"); // 下段
+  // 側面の基準色（ベベル外周など）
+  const [bevelColor, setBevelColor] = useState("#8B4513");
+  // ベベル各セグメントの色（bevelSegments に同期）
+  const [bevelSegmentColors, setBevelSegmentColors] = useState<string[]>(
+    Array.from({ length: 5 }, () => "#8B4513")
+  );
   const [selectedFont, setSelectedFont] = useState(
     "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json"
   );
@@ -83,8 +85,6 @@ export default function Home() {
       settings: {
         color: "#FFD700",
         bevelColor: "#8B4513",
-        bevelColor2: "#6B3A0F",
-        bevelColor3: "#4E2A0A",
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json",
         metalness: 1,
@@ -113,8 +113,6 @@ export default function Home() {
       settings: {
         color: "#fff700",
         bevelColor: "#6b00b3",
-        bevelColor2: "#53008f",
-        bevelColor3: "#3c0069",
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json",
         metalness: 0.8,
@@ -143,8 +141,6 @@ export default function Home() {
       settings: {
         color: "#FF0000",
         bevelColor: "#fbff24",
-        bevelColor2: "#d4db1f",
-        bevelColor3: "#a8af19",
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json",
         metalness: 0.8,
@@ -189,8 +185,12 @@ export default function Home() {
     // テキストは変更しない
     setColor(preset.settings.color);
     setBevelColor(preset.settings.bevelColor);
-    setBevelColor2(preset.settings.bevelColor2 ?? preset.settings.bevelColor);
-    setBevelColor3(preset.settings.bevelColor3 ?? preset.settings.bevelColor);
+    // ベベルセグメント色（プリセット未指定ならベース色で埋める）
+    const segCount = preset.settings.bevelSegments;
+    const segColors = (preset.settings as any).bevelSegmentColors as string[] | undefined;
+    setBevelSegmentColors(
+      Array.from({ length: segCount }, (_, i) => (segColors?.[i] ?? preset.settings.bevelColor))
+    );
     setSelectedFont(preset.settings.selectedFont);
     setMetalness(preset.settings.metalness);
     setRoughness(preset.settings.roughness);
@@ -217,8 +217,7 @@ export default function Home() {
       text,
       color,
       bevelColor,
-      bevelColor2,
-      bevelColor3,
+      bevelSegmentColors,
       fontPath,
       size,
       height,
@@ -239,8 +238,7 @@ export default function Home() {
       text: string;
       color: string;
       bevelColor: string;
-      bevelColor2: string;
-      bevelColor3: string;
+      bevelSegmentColors: string[];
       fontPath: string;
       size: number;
       height: number;
@@ -329,30 +327,6 @@ export default function Home() {
       // 縦書きモード（ベータ版）
       // 注意：半角英数字の回転は基準点の問題で一旦保留
 
-      const tiers = [
-        {
-          sideColor: bevelColor,
-          scale: 1.0,
-          z: 0,
-          tThickness: bevelThickness,
-          tBevelSize: bevelSize,
-        },
-        {
-          sideColor: bevelColor2,
-          scale: 1.02,
-          z: -Math.max(0.05, height * 0.08),
-          tThickness: bevelThickness * 1.2,
-          tBevelSize: bevelSize * 1.1,
-        },
-        {
-          sideColor: bevelColor3,
-          scale: 1.04,
-          z: -Math.max(0.1, height * 0.16),
-          tThickness: bevelThickness * 1.4,
-          tBevelSize: bevelSize * 1.2,
-        },
-      ];
-
       return (
         <group>
           {characters.map((char, index) => {
@@ -364,53 +338,82 @@ export default function Home() {
             return (
               <group key={`char-${index}`} position={[posX, posY, 0]}>
                 <Center>
-                  {tiers.map((tier, tierIndex) => (
-                    <group
-                      key={`char-${index}-tier-${tierIndex}`}
-                      scale={[tier.scale, tier.scale, 1]}
-                      position={[0, 0, tier.z]}
-                    >
-                      <Text3D
-                        key={`t-${tierIndex}`}
-                        font={fontPath}
-                        size={size}
-                        height={height}
-                        curveSegments={curveSegments}
-                        bevelEnabled={bevelEnabled}
-                        bevelThickness={tier.tThickness}
-                        bevelSize={tier.tBevelSize}
-                        bevelOffset={bevelOffset}
-                        bevelSegments={bevelSegments}
-                        position={[0, 0, 0]}
-                      >
-                        {char}
-                        <meshStandardMaterial
-                          attach={(parent) => {
-                            const frontMaterial = new THREE.MeshStandardMaterial({
-                              color: new THREE.Color(color),
-                              metalness: metalness,
-                              roughness: roughness,
-                              emissive: new THREE.Color(emissive),
-                              emissiveIntensity: emissiveIntensity,
-                              map: texture,
-                            });
-                            const sideMaterial = new THREE.MeshStandardMaterial({
-                              color: new THREE.Color(tier.sideColor),
-                              metalness: metalness * 1.2,
-                              roughness: roughness * 0.8,
-                              emissive: new THREE.Color(emissive),
-                              emissiveIntensity: emissiveIntensity * 0.5,
-                            });
-                            parent.material = [frontMaterial, sideMaterial];
-                            return () => {
-                              frontMaterial.dispose();
-                              sideMaterial.dispose();
-                            };
-                          }}
-                        />
-                      </Text3D>
-                    </group>
-                  ))}
+                  <Text3D
+                    font={fontPath}
+                    size={size}
+                    height={height}
+                    curveSegments={curveSegments}
+                    bevelEnabled={bevelEnabled}
+                    bevelThickness={bevelThickness}
+                    bevelSize={bevelSize}
+                    bevelOffset={bevelOffset}
+                    bevelSegments={bevelSegments}
+                    position={[0, 0, 0]}
+                  >
+                    {char}
+                    <meshStandardMaterial
+                      attach={(parent) => {
+                        const frontMaterial = new THREE.MeshStandardMaterial({
+                          color: new THREE.Color(color),
+                          metalness: metalness,
+                          roughness: roughness,
+                          emissive: new THREE.Color(emissive),
+                          emissiveIntensity: emissiveIntensity,
+                          map: texture,
+                        });
+                        const sideMaterial = new THREE.MeshStandardMaterial({
+                          color: new THREE.Color(bevelColor),
+                          metalness: metalness * 1.2,
+                          roughness: roughness * 0.8,
+                          emissive: new THREE.Color(emissive),
+                          emissiveIntensity: emissiveIntensity * 0.5,
+                        });
+
+                        // シェーダ拡張: ベベル領域をセグメント毎に色分け
+                        if (bevelEnabled) sideMaterial.onBeforeCompile = (shader) => {
+                          // uniforms
+                          shader.uniforms.uDepth = { value: height };
+                          shader.uniforms.uBevelThickness = { value: bevelThickness };
+                          shader.uniforms.uBevelSegments = { value: bevelSegments };
+                          const colors = bevelSegmentColors.map((hex) => new THREE.Color(hex));
+                          // 最大10色まで
+                          const MAX = 10;
+                          const padded = Array.from({ length: MAX }, (_, i) => colors[i] ?? new THREE.Color(bevelColor));
+                          shader.uniforms.uColors = { value: padded };
+
+                          // vertex: local position/normal を伝搬
+                          shader.vertexShader = shader.vertexShader
+                            .replace(
+                              '#include <common>',
+                              `#include <common>\n varying vec3 vPos;\n varying vec3 vNrm;`
+                            )
+                            .replace(
+                              '#include <begin_vertex>',
+                              `#include <begin_vertex>\n vPos = position;\n vNrm = normalize(normal);`
+                            );
+
+                          // fragment: ベベル近傍を検出しセグメント別に色指定（法線のZ成分でベベル角度を推定）
+                          shader.fragmentShader = shader.fragmentShader
+                            .replace(
+                              '#include <common>',
+                              `#include <common>\n varying vec3 vPos;\n varying vec3 vNrm;\n uniform float uDepth;\n uniform float uBevelThickness;\n uniform int uBevelSegments;\n uniform vec3 uColors[10];`
+                            )
+                            .replace(
+                              'vec4 diffuseColor = vec4( diffuse, opacity );',
+                              `vec4 diffuseColor = vec4( diffuse, opacity );\n\n // 法線のZ成分からベベル角度を近似（±Z=面、0=側面、途中=ベベル）\n float nz = abs(vNrm.z);\n if (uBevelSegments > 0 && nz > 0.05 && nz < 0.95) {\n   float t = 1.0 - nz; // 0:面に近い, 1:側面に近い\n   float segF = floor(t * float(uBevelSegments));\n   int seg = int(clamp(segF, 0.0, float(uBevelSegments - 1)));\n   vec3 segColor = uColors[seg];\n   diffuseColor.rgb = segColor;\n }`
+                            );
+
+                          (sideMaterial as any).userData.shader = shader;
+                        };
+
+                        parent.material = [frontMaterial, sideMaterial];
+                        return () => {
+                          frontMaterial.dispose();
+                          sideMaterial.dispose();
+                        };
+                      }}
+                    />
+                  </Text3D>
                 </Center>
               </group>
             );
@@ -538,8 +541,7 @@ export default function Home() {
                   text={text}
                   color={color}
                   bevelColor={bevelColor}
-                  bevelColor2={bevelColor2}
-                  bevelColor3={bevelColor3}
+                  bevelSegmentColors={bevelSegmentColors}
                   fontPath={selectedFont}
                   size={size}
                   height={height}
@@ -662,7 +664,7 @@ export default function Home() {
 
               <div>
                 <label className="block mb-2 text-sm font-medium">
-                  ベベル色（上段） / Bevel Color Top
+                  側面・ベース色 / Side Base Color
                 </label>
                 <input
                   type="color"
@@ -672,28 +674,25 @@ export default function Home() {
                 />
               </div>
 
-              <div>
-                <label className="block mb-2 text-sm font-medium">
-                  ベベル色（中段） / Bevel Color Middle
-                </label>
-                <input
-                  type="color"
-                  value={bevelColor2}
-                  onChange={(e) => setBevelColor2(e.target.value)}
-                  className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-2 text-sm font-medium">
-                  ベベル色（下段） / Bevel Color Bottom
-                </label>
-                <input
-                  type="color"
-                  value={bevelColor3}
-                  onChange={(e) => setBevelColor3(e.target.value)}
-                  className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
-                />
+              <div className="space-y-2">
+                <div className="block mb-2 text-sm font-medium">
+                  ベベル色（セグメントごと） / Bevel Segment Colors
+                </div>
+                {Array.from({ length: bevelSegments }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="text-xs w-20">Segment {i + 1}</span>
+                    <input
+                      type="color"
+                      value={bevelSegmentColors[i] ?? bevelColor}
+                      onChange={(e) => {
+                        const next = [...bevelSegmentColors];
+                        next[i] = e.target.value;
+                        setBevelSegmentColors(next);
+                      }}
+                      className="h-8 w-14 bg-white border border-gray-300 rounded cursor-pointer"
+                    />
+                  </div>
+                ))}
               </div>
 
               {/* 3D Parameters */}
@@ -791,7 +790,14 @@ export default function Home() {
                     max="10"
                     step="1"
                     value={bevelSegments}
-                    onChange={(e) => setBevelSegments(parseInt(e.target.value))}
+                    onChange={(e) => {
+                      const n = parseInt(e.target.value);
+                      setBevelSegments(n);
+                      setBevelSegmentColors((prev) => {
+                        const next = Array.from({ length: n }, (_, i) => prev[i] ?? bevelColor);
+                        return next;
+                      });
+                    }}
                     className="w-full"
                   />
                 </div>
@@ -966,8 +972,7 @@ export default function Home() {
                         text,
                         color,
                         bevelColor,
-                        bevelColor2,
-                        bevelColor3,
+                        bevelSegmentColors,
                         selectedFont,
                         metalness,
                         roughness,
@@ -1001,10 +1006,8 @@ export default function Home() {
                           setColor(settings.color);
                         if (settings.bevelColor !== undefined)
                           setBevelColor(settings.bevelColor);
-                        if (settings.bevelColor2 !== undefined)
-                          setBevelColor2(settings.bevelColor2);
-                        if (settings.bevelColor3 !== undefined)
-                          setBevelColor3(settings.bevelColor3);
+                        if (settings.bevelSegmentColors !== undefined && Array.isArray(settings.bevelSegmentColors))
+                          setBevelSegmentColors(settings.bevelSegmentColors);
                         if (settings.selectedFont !== undefined)
                           setSelectedFont(settings.selectedFont);
                         if (settings.metalness !== undefined)
