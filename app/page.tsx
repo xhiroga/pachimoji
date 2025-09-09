@@ -683,20 +683,7 @@ export default function Home() {
               <div className="space-y-4 border-t pt-4">
                 <h3 className="font-medium">3D設定 / 3D Parameters</h3>
 
-                <div>
-                  <label className="block mb-1 text-sm">
-                    サイズ / Size: {size.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="3"
-                    step="0.1"
-                    value={size}
-                    onChange={(e) => setSize(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
+                {/* サイズはズームで代替のためUIから削除 */}
 
                 {/* 傾き（チルト）はリリースでは未使用のため削除 */}
 
