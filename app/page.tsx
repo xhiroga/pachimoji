@@ -471,7 +471,7 @@ export default function Home() {
       />
       <div className="min-h-screen bg-white text-gray-900">
         <div className="container mx-auto p-8">
-          <div className="mb-8">
+          <div className="mb-8 flex items-center justify-between">
             <Image
               src="/images/logo.png"
               alt="パチ文字メーカー"
@@ -479,6 +479,29 @@ export default function Home() {
               height={48}
               className="h-12 w-auto"
             />
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              title="ダウンロード"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                className="w-5 h-5"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v1.125A2.625 2.625 0 005.625 20.25h12.75A2.625 2.625 0 0021 17.625V16.5M7.5 9l4.5 4.5L16.5 9M12 3v10.5"
+                />
+              </svg>
+              ダウンロード
+            </button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -555,13 +578,7 @@ export default function Home() {
                 />
               </div>
 
-              <button
-                type="button"
-                onClick={handleDownload}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-full"
-              >
-                画像ダウンロード（透過PNG）
-              </button>
+              {/* ダウンロードボタンはヘッダー右上へ移動 */}
 
               <div>
                 <label
