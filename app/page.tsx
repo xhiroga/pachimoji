@@ -43,7 +43,7 @@ export default function Home() {
   const [letterSpacing, setLetterSpacing] = useState(1.0);
   const [isVertical, setIsVertical] = useState(false);
   const [isJsonOpen, setIsJsonOpen] = useState(false);
-  const [tiltAngle, setTiltAngle] = useState(0); // 文字の傾き（度）
+  // 傾き（チルト）はリリースでは未使用のため削除
 
   const fonts = [
     {
@@ -235,7 +235,6 @@ export default function Home() {
       selectedTexture,
       letterSpacing,
       isVertical,
-      tiltAngle,
     }: {
       text: string;
       color: string;
@@ -258,7 +257,6 @@ export default function Home() {
       selectedTexture: string;
       letterSpacing: number;
       isVertical: boolean;
-      tiltAngle: number;
     }) => {
       const sanitized = text.replace(/\n/g, " ");
       const characters = [...sanitized]; // 文字列を1文字ずつの配列に分解
@@ -356,7 +354,7 @@ export default function Home() {
       ];
 
       return (
-        <group rotation={[0, 0, THREE.MathUtils.degToRad(tiltAngle)]}>
+        <group>
           {characters.map((char, index) => {
             const posX = isVertical ? 0 : charPositions[index] - centerOffset;
             const posY = isVertical
@@ -535,7 +533,6 @@ export default function Home() {
                   selectedTexture={selectedTexture}
                   letterSpacing={letterSpacing}
                   isVertical={isVertical}
-                  tiltAngle={tiltAngle}
                 />
                 <OrbitControls enablePan={false} enableZoom enableRotate />
               </Canvas>
@@ -701,20 +698,7 @@ export default function Home() {
                   />
                 </div>
 
-                <div>
-                  <label className="block mb-1 text-sm">
-                    傾き / Tilt: {Math.round(tiltAngle)}°
-                  </label>
-                  <input
-                    type="range"
-                    min="-60"
-                    max="60"
-                    step="1"
-                    value={tiltAngle}
-                    onChange={(e) => setTiltAngle(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
+                {/* 傾き（チルト）はリリースでは未使用のため削除 */}
 
                 <div>
                   <label className="block mb-1 text-sm">
@@ -999,7 +983,6 @@ export default function Home() {
                         selectedTexture,
                         letterSpacing,
                         isVertical,
-                        tiltAngle,
                       },
                       null,
                       2
@@ -1055,8 +1038,7 @@ export default function Home() {
                           setLetterSpacing(settings.letterSpacing);
                         if (settings.isVertical !== undefined)
                           setIsVertical(settings.isVertical);
-                        if (settings.tiltAngle !== undefined)
-                          setTiltAngle(settings.tiltAngle);
+                        // tiltAngle は削除
                       } catch {
                         // Invalid JSON - ignore
                       }
