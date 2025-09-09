@@ -11,7 +11,10 @@ import { sendGAEvent } from "@/utils/analytics";
 export default function Home() {
   const [text, setText] = useState("全国最大級");
   const [color, setColor] = useState("#FFD700"); // ゴールド色
-  const [bevelColor, setBevelColor] = useState("#8B4513"); // 茶色
+  // 3段ベベル用の色（1=上段、2=中段、3=下段）
+  const [bevelColor, setBevelColor] = useState("#8B4513"); // 上段（従来のベベル色）
+  const [bevelColor2, setBevelColor2] = useState("#6B3A0F"); // 中段
+  const [bevelColor3, setBevelColor3] = useState("#4E2A0A"); // 下段
   const [selectedFont, setSelectedFont] = useState(
     "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json"
   );
@@ -40,6 +43,7 @@ export default function Home() {
   const [letterSpacing, setLetterSpacing] = useState(1.0);
   const [isVertical, setIsVertical] = useState(false);
   const [isJsonOpen, setIsJsonOpen] = useState(false);
+  const [tiltAngle, setTiltAngle] = useState(0); // 文字の傾き（度）
 
   const fonts = [
     {
@@ -79,6 +83,8 @@ export default function Home() {
       settings: {
         color: "#FFD700",
         bevelColor: "#8B4513",
+        bevelColor2: "#6B3A0F",
+        bevelColor3: "#4E2A0A",
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json",
         metalness: 1,
@@ -107,6 +113,8 @@ export default function Home() {
       settings: {
         color: "#fff700",
         bevelColor: "#6b00b3",
+        bevelColor2: "#53008f",
+        bevelColor3: "#3c0069",
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json",
         metalness: 0.8,
@@ -135,6 +143,8 @@ export default function Home() {
       settings: {
         color: "#FF0000",
         bevelColor: "#fbff24",
+        bevelColor2: "#d4db1f",
+        bevelColor3: "#a8af19",
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json",
         metalness: 0.8,
@@ -179,6 +189,8 @@ export default function Home() {
     // テキストは変更しない
     setColor(preset.settings.color);
     setBevelColor(preset.settings.bevelColor);
+    setBevelColor2(preset.settings.bevelColor2 ?? preset.settings.bevelColor);
+    setBevelColor3(preset.settings.bevelColor3 ?? preset.settings.bevelColor);
     setSelectedFont(preset.settings.selectedFont);
     setMetalness(preset.settings.metalness);
     setRoughness(preset.settings.roughness);
@@ -205,6 +217,8 @@ export default function Home() {
       text,
       color,
       bevelColor,
+      bevelColor2,
+      bevelColor3,
       fontPath,
       size,
       height,
@@ -221,10 +235,13 @@ export default function Home() {
       selectedTexture,
       letterSpacing,
       isVertical,
+      tiltAngle,
     }: {
       text: string;
       color: string;
       bevelColor: string;
+      bevelColor2: string;
+      bevelColor3: string;
       fontPath: string;
       size: number;
       height: number;
@@ -241,6 +258,7 @@ export default function Home() {
       selectedTexture: string;
       letterSpacing: number;
       isVertical: boolean;
+      tiltAngle: number;
     }) => {
       const sanitized = text.replace(/\n/g, " ");
       const characters = [...sanitized]; // 文字列を1文字ずつの配列に分解
@@ -313,62 +331,93 @@ export default function Home() {
       // 縦書きモード（ベータ版）
       // 注意：半角英数字の回転は基準点の問題で一旦保留
 
-      return (
-        <Center>
-          <group>
-            {characters.map((char, index) => {
-              const posX = isVertical ? 0 : charPositions[index] - centerOffset;
-              const posY = isVertical
-                ? -(charPositions[index] - centerOffset)
-                : 0;
+      const tiers = [
+        {
+          sideColor: bevelColor,
+          scale: 1.0,
+          z: 0,
+          tThickness: bevelThickness,
+          tBevelSize: bevelSize,
+        },
+        {
+          sideColor: bevelColor2,
+          scale: 1.02,
+          z: -Math.max(0.05, height * 0.08),
+          tThickness: bevelThickness * 1.2,
+          tBevelSize: bevelSize * 1.1,
+        },
+        {
+          sideColor: bevelColor3,
+          scale: 1.04,
+          z: -Math.max(0.1, height * 0.16),
+          tThickness: bevelThickness * 1.4,
+          tBevelSize: bevelSize * 1.2,
+        },
+      ];
 
-              return (
-                <Text3D
-                  key={index}
-                  font={fontPath}
-                  size={size}
-                  height={height}
-                  curveSegments={curveSegments}
-                  bevelEnabled={bevelEnabled}
-                  bevelThickness={bevelThickness}
-                  bevelSize={bevelSize}
-                  bevelOffset={bevelOffset}
-                  bevelSegments={bevelSegments}
-                  position={[posX, posY, 0]}
-                >
-                  {char}
-                  {/* Try JSX approach for multi-material */}
-                  <meshStandardMaterial
-                    attach={(parent) => {
-                      // Create materials array and assign to parent
-                      const frontMaterial = new THREE.MeshStandardMaterial({
-                        color: new THREE.Color(color),
-                        metalness: metalness,
-                        roughness: roughness,
-                        emissive: new THREE.Color(emissive),
-                        emissiveIntensity: emissiveIntensity,
-                        map: texture, // テクスチャを適用
-                      });
-                      const sideMaterial = new THREE.MeshStandardMaterial({
-                        color: new THREE.Color(bevelColor),
-                        metalness: metalness * 1.2,
-                        roughness: roughness * 0.8,
-                        emissive: new THREE.Color(emissive),
-                        emissiveIntensity: emissiveIntensity * 0.5,
-                      });
-                      parent.material = [frontMaterial, sideMaterial];
-                      return () => {
-                        // Cleanup
-                        frontMaterial.dispose();
-                        sideMaterial.dispose();
-                      };
-                    }}
-                  />
-                </Text3D>
-              );
-            })}
-          </group>
-        </Center>
+      return (
+        <group rotation={[0, 0, THREE.MathUtils.degToRad(tiltAngle)]}>
+          {characters.map((char, index) => {
+            const posX = isVertical ? 0 : charPositions[index] - centerOffset;
+            const posY = isVertical
+              ? -(charPositions[index] - centerOffset)
+              : 0;
+
+            return (
+              <group key={`char-${index}`} position={[posX, posY, 0]}>
+                <Center>
+                  {tiers.map((tier, tierIndex) => (
+                    <group
+                      key={`char-${index}-tier-${tierIndex}`}
+                      scale={[tier.scale, tier.scale, 1]}
+                      position={[0, 0, tier.z]}
+                    >
+                      <Text3D
+                        key={`t-${tierIndex}`}
+                        font={fontPath}
+                        size={size}
+                        height={height}
+                        curveSegments={curveSegments}
+                        bevelEnabled={bevelEnabled}
+                        bevelThickness={tier.tThickness}
+                        bevelSize={tier.tBevelSize}
+                        bevelOffset={bevelOffset}
+                        bevelSegments={bevelSegments}
+                        position={[0, 0, 0]}
+                      >
+                        {char}
+                        <meshStandardMaterial
+                          attach={(parent) => {
+                            const frontMaterial = new THREE.MeshStandardMaterial({
+                              color: new THREE.Color(color),
+                              metalness: metalness,
+                              roughness: roughness,
+                              emissive: new THREE.Color(emissive),
+                              emissiveIntensity: emissiveIntensity,
+                              map: texture,
+                            });
+                            const sideMaterial = new THREE.MeshStandardMaterial({
+                              color: new THREE.Color(tier.sideColor),
+                              metalness: metalness * 1.2,
+                              roughness: roughness * 0.8,
+                              emissive: new THREE.Color(emissive),
+                              emissiveIntensity: emissiveIntensity * 0.5,
+                            });
+                            parent.material = [frontMaterial, sideMaterial];
+                            return () => {
+                              frontMaterial.dispose();
+                              sideMaterial.dispose();
+                            };
+                          }}
+                        />
+                      </Text3D>
+                    </group>
+                  ))}
+                </Center>
+              </group>
+            );
+          })}
+        </group>
       );
     }
   );
@@ -468,6 +517,8 @@ export default function Home() {
                   text={text}
                   color={color}
                   bevelColor={bevelColor}
+                  bevelColor2={bevelColor2}
+                  bevelColor3={bevelColor3}
                   fontPath={selectedFont}
                   size={size}
                   height={height}
@@ -484,6 +535,7 @@ export default function Home() {
                   selectedTexture={selectedTexture}
                   letterSpacing={letterSpacing}
                   isVertical={isVertical}
+                  tiltAngle={tiltAngle}
                 />
                 <OrbitControls enablePan={false} enableZoom enableRotate />
               </Canvas>
@@ -595,17 +647,37 @@ export default function Home() {
               </div>
 
               <div>
-                <label
-                  htmlFor="bevel-color-input"
-                  className="block mb-2 text-sm font-medium"
-                >
-                  ベベル色 / Bevel Color
+                <label className="block mb-2 text-sm font-medium">
+                  ベベル色（上段） / Bevel Color Top
                 </label>
                 <input
-                  id="bevel-color-input"
                   type="color"
                   value={bevelColor}
                   onChange={(e) => setBevelColor(e.target.value)}
+                  className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium">
+                  ベベル色（中段） / Bevel Color Middle
+                </label>
+                <input
+                  type="color"
+                  value={bevelColor2}
+                  onChange={(e) => setBevelColor2(e.target.value)}
+                  className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium">
+                  ベベル色（下段） / Bevel Color Bottom
+                </label>
+                <input
+                  type="color"
+                  value={bevelColor3}
+                  onChange={(e) => setBevelColor3(e.target.value)}
                   className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
                 />
               </div>
@@ -625,6 +697,21 @@ export default function Home() {
                     step="0.1"
                     value={size}
                     onChange={(e) => setSize(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-1 text-sm">
+                    傾き / Tilt: {Math.round(tiltAngle)}°
+                  </label>
+                  <input
+                    type="range"
+                    min="-60"
+                    max="60"
+                    step="1"
+                    value={tiltAngle}
+                    onChange={(e) => setTiltAngle(parseFloat(e.target.value))}
                     className="w-full"
                   />
                 </div>
@@ -891,6 +978,8 @@ export default function Home() {
                         text,
                         color,
                         bevelColor,
+                        bevelColor2,
+                        bevelColor3,
                         selectedFont,
                         metalness,
                         roughness,
@@ -910,6 +999,7 @@ export default function Home() {
                         selectedTexture,
                         letterSpacing,
                         isVertical,
+                        tiltAngle,
                       },
                       null,
                       2
@@ -924,6 +1014,10 @@ export default function Home() {
                           setColor(settings.color);
                         if (settings.bevelColor !== undefined)
                           setBevelColor(settings.bevelColor);
+                        if (settings.bevelColor2 !== undefined)
+                          setBevelColor2(settings.bevelColor2);
+                        if (settings.bevelColor3 !== undefined)
+                          setBevelColor3(settings.bevelColor3);
                         if (settings.selectedFont !== undefined)
                           setSelectedFont(settings.selectedFont);
                         if (settings.metalness !== undefined)
@@ -961,6 +1055,8 @@ export default function Home() {
                           setLetterSpacing(settings.letterSpacing);
                         if (settings.isVertical !== undefined)
                           setIsVertical(settings.isVertical);
+                        if (settings.tiltAngle !== undefined)
+                          setTiltAngle(settings.tiltAngle);
                       } catch {
                         // Invalid JSON - ignore
                       }
