@@ -34,8 +34,6 @@ export default function Home() {
 
   // Text3D Parameters
   const [size, setSize] = useState(1);
-  const [height, setHeight] = useState(1); // デフォルト1に変更
-  const [curveSegments, setCurveSegments] = useState(12);
   const [bevelEnabled, setBevelEnabled] = useState(true);
   const [bevelThickness, setBevelThickness] = useState(0.1);
   const [bevelSize, setBevelSize] = useState(0.1); // デフォルト0.1に変更
@@ -77,12 +75,10 @@ export default function Home() {
         metalness: 1,
         roughness: 0.6,
         
-        ambientIntensity: 1,
-        mainLightIntensity: 20,
-        sideLightIntensity: 20,
+        ambientIntensity: 2.8,
+        mainLightIntensity: 3.6,
+        sideLightIntensity: 2.6,
         size: 1.0,
-        height: 1,
-        curveSegments: 12,
         bevelEnabled: true,
         bevelThickness: 0.1,
         bevelSize: 0.1,
@@ -104,12 +100,10 @@ export default function Home() {
         metalness: 0.8,
         roughness: 0.1,
         
-        ambientIntensity: 2,
-        mainLightIntensity: 30,
-        sideLightIntensity: 25,
+        ambientIntensity: 2.4,
+        mainLightIntensity: 3.0,
+        sideLightIntensity: 2.2,
         size: 1.0,
-        height: 2.1,
-        curveSegments: 16,
         bevelEnabled: true,
         bevelThickness: 0.19,
         bevelSize: 0.06,
@@ -131,12 +125,10 @@ export default function Home() {
         metalness: 0.8,
         roughness: 0.4,
         
-        ambientIntensity: 1.5,
-        mainLightIntensity: 25,
-        sideLightIntensity: 15,
+        ambientIntensity: 2.0,
+        mainLightIntensity: 4.0,
+        sideLightIntensity: 2.5,
         size: 1.0,
-        height: 0.7,
-        curveSegments: 9,
         bevelEnabled: true,
         bevelThickness: 0.214,
         bevelSize: 0.1,
@@ -182,8 +174,6 @@ export default function Home() {
     setMainLightIntensity(preset.settings.mainLightIntensity);
     setSideLightIntensity(preset.settings.sideLightIntensity);
     setSize(preset.settings.size);
-    setHeight(preset.settings.height);
-    setCurveSegments(preset.settings.curveSegments);
     setBevelEnabled(preset.settings.bevelEnabled);
     setBevelThickness(preset.settings.bevelThickness);
     setBevelSize(preset.settings.bevelSize);
@@ -202,8 +192,7 @@ export default function Home() {
       bevelSegmentColors,
       fontPath,
       size,
-      height,
-      curveSegments,
+      
       bevelEnabled,
       bevelThickness,
       bevelSize,
@@ -221,8 +210,7 @@ export default function Home() {
       bevelSegmentColors: string[];
       fontPath: string;
       size: number;
-      height: number;
-      curveSegments: number;
+      
       bevelEnabled: boolean;
       bevelThickness: number;
       bevelSize: number;
@@ -292,8 +280,8 @@ export default function Home() {
                   <Text3D
                     font={fontPath}
                     size={size}
-                    height={height}
-                    curveSegments={curveSegments}
+                    height={1.0}
+                    curveSegments={12}
                     bevelEnabled={bevelEnabled}
                     bevelThickness={bevelThickness}
                     bevelSize={bevelSize}
@@ -319,7 +307,7 @@ export default function Home() {
                         // シェーダ拡張: ベベル領域をセグメント毎に色分け
                         if (bevelEnabled) sideMaterial.onBeforeCompile = (shader) => {
                           // uniforms
-                          shader.uniforms.uDepth = { value: height };
+                          shader.uniforms.uDepth = { value: 1.0 };
                           shader.uniforms.uBevelThickness = { value: bevelThickness };
                           shader.uniforms.uBevelSegments = { value: bevelSegments };
                           const colors = bevelSegmentColors.map((hex) => new THREE.Color(hex));
@@ -493,8 +481,6 @@ export default function Home() {
                   bevelSegmentColors={bevelSegmentColors}
                   fontPath={selectedFont}
                   size={size}
-                  height={height}
-                  curveSegments={curveSegments}
                   bevelEnabled={bevelEnabled}
                   bevelThickness={bevelThickness}
                   bevelSize={bevelSize}
@@ -649,35 +635,7 @@ export default function Home() {
 
                 
 
-                <div>
-                  <label className="block mb-1 text-sm">
-                    高さ（奥行き） / Height (Depth): {height.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    value={height}
-                    onChange={(e) => setHeight(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    カーブ分割数 / Curve Segments: {curveSegments}
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="20"
-                    step="1"
-                    value={curveSegments}
-                    onChange={(e) => setCurveSegments(parseInt(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
+                {/* height と curveSegments は固定化（height=1.0, curveSegments=12）*/}
 
                 <div>
                   <label className="block mb-1 text-sm">
@@ -875,8 +833,6 @@ export default function Home() {
                         mainLightIntensity,
                         sideLightIntensity,
                         size,
-                        height,
-                        curveSegments,
                         bevelEnabled,
                         bevelThickness,
                         bevelSize,
@@ -915,10 +871,6 @@ export default function Home() {
                           setSideLightIntensity(settings.sideLightIntensity);
                         
                         if (settings.size !== undefined) setSize(settings.size);
-                        if (settings.height !== undefined)
-                          setHeight(settings.height);
-                        if (settings.curveSegments !== undefined)
-                          setCurveSegments(settings.curveSegments);
                         if (settings.bevelEnabled !== undefined)
                           setBevelEnabled(settings.bevelEnabled);
                         if (settings.bevelThickness !== undefined)
