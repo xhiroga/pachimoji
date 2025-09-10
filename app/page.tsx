@@ -24,12 +24,13 @@ export default function Home() {
   // Material Effects
   const [metalness, setMetalness] = useState(1.0);
   const [roughness, setRoughness] = useState(0.6);
-  // 自己発光とテクスチャは撤廃（ライト統一のため）
+  
 
   // Lighting Controls
-  const [ambientIntensity, setAmbientIntensity] = useState(1.0);
-  const [mainLightIntensity, setMainLightIntensity] = useState(20.0);
-  const [sideLightIntensity, setSideLightIntensity] = useState(20.0);
+  // Lighting (Simple + Stable recipe)
+  const [ambientIntensity, setAmbientIntensity] = useState(3.0);
+  const [mainLightIntensity, setMainLightIntensity] = useState(3.0); // Key (front-left-up)
+  const [sideLightIntensity, setSideLightIntensity] = useState(3.0); // Fill (front-right-down)
 
   // Text3D Parameters
   const [size, setSize] = useState(1);
@@ -43,7 +44,7 @@ export default function Home() {
   const [letterSpacing, setLetterSpacing] = useState(1.0);
   const [isVertical, setIsVertical] = useState(false);
   const [isJsonOpen, setIsJsonOpen] = useState(false);
-  // 傾き（チルト）はリリースでは未使用のため削除
+  
 
   const fonts = [
     {
@@ -60,7 +61,7 @@ export default function Home() {
     },
   ];
 
-  // テクスチャ選択は削除
+  
 
   // プリセットスタイル
   const presets = [
@@ -239,7 +240,7 @@ export default function Home() {
       // フォントデータを読み込み（グリフ情報を取得するため）
       const font = useLoader(FontLoader, fontPath);
 
-      // テクスチャは使用しない
+      
 
       // 縦書き・横書きの文字位置計算
       const charPositions: number[] = [];
@@ -303,6 +304,7 @@ export default function Home() {
                     {char}
                     <meshStandardMaterial
                       attach={(parent) => {
+                        // フェイスもPBRで表現（キー正面＋フィルで色の再現性を確保）
                         const frontMaterial = new THREE.MeshStandardMaterial({
                           color: new THREE.Color(color),
                           metalness: metalness,
@@ -467,20 +469,22 @@ export default function Home() {
                 {/* シンプルな3灯ライティング */}
                 <ambientLight intensity={ambientIntensity} color="#ffffff" />
 
-                {/* メインライト（正面上から） */}
+                {/* Key light: further front-left-up */}
                 <directionalLight
-                  position={[0, 10, 5]}
+                  position={[-6, 4, 8]}
                   intensity={mainLightIntensity}
                   color="#ffffff"
                   castShadow
                 />
 
-                {/* サイドライト（右から） */}
+                {/* Fill light: further front-right-down */}
                 <directionalLight
-                  position={[5, 3, 0]}
+                  position={[6, -3, 6]}
                   intensity={sideLightIntensity}
-                  color="#ffff99"
+                  color="#ffffff"
                 />
+
+                
 
                 <Text3DContent
                   text={text}
@@ -641,9 +645,9 @@ export default function Home() {
               <div className="space-y-4 border-t pt-4">
                 <h3 className="font-medium">3D設定 / 3D Parameters</h3>
 
-                {/* サイズはズームで代替のためUIから削除 */}
+                
 
-                {/* 傾き（チルト）はリリースでは未使用のため削除 */}
+                
 
                 <div>
                   <label className="block mb-1 text-sm">
@@ -781,7 +785,7 @@ export default function Home() {
                   />
                 </div>
 
-                {/* 自己発光・テクスチャのコントロールは削除 */}
+                
               </div>
 
               {/* Lighting Controls */}
@@ -809,12 +813,12 @@ export default function Home() {
 
                 <div>
                   <label className="block mb-1 text-sm">
-                    メインライト / Main Light: {mainLightIntensity.toFixed(2)}
+                    メインライト（キー） / Key: {mainLightIntensity.toFixed(2)}
                   </label>
                   <input
                     type="range"
                     min="0"
-                    max="50"
+                    max="10"
                     step="0.1"
                     value={mainLightIntensity}
                     onChange={(e) =>
@@ -826,12 +830,12 @@ export default function Home() {
 
                 <div>
                   <label className="block mb-1 text-sm">
-                    サイドライト / Side Light: {sideLightIntensity.toFixed(2)}
+                    フィルライト / Fill: {sideLightIntensity.toFixed(2)}
                   </label>
                   <input
                     type="range"
                     min="0"
-                    max="30"
+                    max="10"
                     step="0.1"
                     value={sideLightIntensity}
                     onChange={(e) =>
@@ -840,6 +844,8 @@ export default function Home() {
                     className="w-full"
                   />
                 </div>
+
+                
               </div>
 
               {/* JSON Settings */}
@@ -900,13 +906,14 @@ export default function Home() {
                           setMetalness(settings.metalness);
                         if (settings.roughness !== undefined)
                           setRoughness(settings.roughness);
-                        // emissive* は削除
+                        
                         if (settings.ambientIntensity !== undefined)
                           setAmbientIntensity(settings.ambientIntensity);
                         if (settings.mainLightIntensity !== undefined)
                           setMainLightIntensity(settings.mainLightIntensity);
                         if (settings.sideLightIntensity !== undefined)
                           setSideLightIntensity(settings.sideLightIntensity);
+                        
                         if (settings.size !== undefined) setSize(settings.size);
                         if (settings.height !== undefined)
                           setHeight(settings.height);
@@ -922,12 +929,12 @@ export default function Home() {
                           setBevelOffset(settings.bevelOffset);
                         if (settings.bevelSegments !== undefined)
                           setBevelSegments(settings.bevelSegments);
-                        // texture 選択は削除
+                        
                         if (settings.letterSpacing !== undefined)
                           setLetterSpacing(settings.letterSpacing);
                         if (settings.isVertical !== undefined)
                           setIsVertical(settings.isVertical);
-                        // tiltAngle は削除
+                        
                       } catch {
                         // Invalid JSON - ignore
                       }
