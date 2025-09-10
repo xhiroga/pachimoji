@@ -16,7 +16,7 @@ export default function Home() {
   const [bevelColor, setBevelColor] = useState("#ffff00");
   // ベベル各セグメントの色（bevelSegments に同期）
   const [bevelSegmentColors, setBevelSegmentColors] = useState<string[]>([
-    "#ff3838",
+    "#c70000",
     "#000000",
     "#ff9500",
   ]);
@@ -98,7 +98,7 @@ export default function Home() {
       settings: {
         color: "#ffff00",
         bevelColor: "#ffff00",
-        bevelSegmentColors: ["#ff3838", "#000000", "#ff9500"],
+        bevelSegmentColors: ["#c70000", "#000000", "#ff9500"],
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json",
         metalness: 1,
