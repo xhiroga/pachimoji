@@ -10,33 +10,35 @@ import { sendGAEvent } from "@/utils/analytics";
 
 export default function Home() {
   const [text, setText] = useState("全国最大級");
-  const [color, setColor] = useState("#FFD700"); // ゴールド色
+  const [color, setColor] = useState("#ffff00");
   // 側面の基準色（ベベル外周など）
-  const [bevelColor, setBevelColor] = useState("#8B4513");
+  const [bevelColor, setBevelColor] = useState("#ffff00");
   // ベベル各セグメントの色（bevelSegments に同期）
-  const [bevelSegmentColors, setBevelSegmentColors] = useState<string[]>(
-    Array.from({ length: 3 }, () => "#8B4513")
-  );
+  const [bevelSegmentColors, setBevelSegmentColors] = useState<string[]>([
+    "#ff3838",
+    "#000000",
+    "#ff9500",
+  ]);
   const [selectedFont, setSelectedFont] = useState(
     "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json"
   );
 
   // Material Effects
   const [metalness, setMetalness] = useState(1.0);
-  const [roughness, setRoughness] = useState(0.6);
+  const [roughness, setRoughness] = useState(0.9);
   
 
   // Lighting Controls
   // Lighting (Simple + Stable recipe)
   const [ambientIntensity, setAmbientIntensity] = useState(3.0);
-  const [mainLightIntensity, setMainLightIntensity] = useState(3.0); // Key (front-left-up)
+  const [mainLightIntensity, setMainLightIntensity] = useState(9.0); // Key (front-left-up)
   const [sideLightIntensity, setSideLightIntensity] = useState(3.0); // Fill (front-right-down)
 
   // Text3D Parameters
   const [size, setSize] = useState(1);
   const [bevelEnabled, setBevelEnabled] = useState(true);
   const [bevelThickness, setBevelThickness] = useState(0.5);
-  const [bevelSize, setBevelSize] = useState(0.15);
+  const [bevelSize, setBevelSize] = useState(0.2);
   const [bevelSegments, setBevelSegments] = useState(3);
   const [letterSpacing, setLetterSpacing] = useState(1.0);
   const [isVertical, setIsVertical] = useState(false);
@@ -67,71 +69,77 @@ export default function Home() {
       text: "全国最大級",
       image: "/images/sample-gothic.png",
       settings: {
-        color: "#FFD700",
-        bevelColor: "#8B4513",
+        color: "#ffff00",
+        bevelColor: "#ffff00",
+        bevelSegmentColors: ["#ff3838", "#000000", "#ff9500"],
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json",
         metalness: 1,
-        roughness: 0.6,
+        roughness: 0.9,
         
-        ambientIntensity: 2.8,
-        mainLightIntensity: 3.6,
-        sideLightIntensity: 2.6,
-        size: 1.0,
+        ambientIntensity: 3,
+        mainLightIntensity: 9,
+        sideLightIntensity: 3,
+        size: 1,
         bevelEnabled: true,
-        bevelThickness: 0.1,
-        bevelSize: 0.1,
-        bevelSegments: 5,
+        bevelThickness: 0.5,
+        bevelSize: 0.2,
+        bevelSegments: 3,
         
-        letterSpacing: 1.0,
+        letterSpacing: 1,
+        isVertical: false,
       },
     },
     {
       name: "高級感＆明朝",
-      text: "新台入替",
+      text: "新台入荷",
       image: "/images/sample-mincho.png",
       settings: {
-        color: "#fff700",
-        bevelColor: "#6b00b3",
+        color: "#ffff00",
+        bevelColor: "#ffff00",
+        bevelSegmentColors: ["#ff6600", "#000000"],
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json",
-        metalness: 0.8,
-        roughness: 0.1,
+        metalness: 0.2,
+        roughness: 1,
         
-        ambientIntensity: 2.4,
-        mainLightIntensity: 3.0,
-        sideLightIntensity: 2.2,
-        size: 1.0,
+        ambientIntensity: 3,
+        mainLightIntensity: 3,
+        sideLightIntensity: 3,
+        size: 1,
         bevelEnabled: true,
-        bevelThickness: 0.19,
-        bevelSize: 0.06,
-        bevelSegments: 8,
+        bevelThickness: 0.15,
+        bevelSize: 0.04,
+        bevelSegments: 2,
         
-        letterSpacing: 1.0,
+        letterSpacing: 0.6,
+        isVertical: false,
       },
     },
     {
       name: "激熱！筆文字",
-      text: "激アツ!",
+      text: "激アツ",
       image: "/images/sample-kaisho.png",
       settings: {
-        color: "#FF0000",
-        bevelColor: "#fbff24",
+        color: "#ff0000",
+        bevelColor: "#ff0000",
+        bevelSegmentColors: ["#ffea00", "#ffffff"],
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json",
-        metalness: 0.8,
-        roughness: 0.4,
+        metalness: 0.7,
+        roughness: 0.5,
         
-        ambientIntensity: 2.0,
-        mainLightIntensity: 4.0,
-        sideLightIntensity: 2.5,
-        size: 1.0,
+        ambientIntensity: 4,
+        mainLightIntensity: 3,
+        sideLightIntensity: 3,
+        size: 1,
         bevelEnabled: true,
-        bevelThickness: 0.214,
-        bevelSize: 0.1,
-        bevelSegments: 7,
+        bevelThickness: 0.3,
+        bevelSize: 0.2,
+        bevelSegments: 2,
         
-        letterSpacing: 1.0,
+        letterSpacing: 1.1,
+        isVertical: false,
       },
     },
   ];
