@@ -3,43 +3,48 @@
 import { useState, useCallback, memo } from "react";
 import Image from "next/image";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { Text3D, Center, OrbitControls, useTexture } from "@react-three/drei";
+import { Text3D, Center, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { sendGAEvent } from "@/utils/analytics";
+// Shader type is internal to three; avoid importing and use unknown where needed.
 
 export default function Home() {
   const [text, setText] = useState("全国最大級");
-  const [color, setColor] = useState("#FFD700"); // ゴールド色
-  const [bevelColor, setBevelColor] = useState("#8B4513"); // 茶色
+  const [color, setColor] = useState("#ffff00");
+  // 側面の基準色（ベベル外周など）
+  const [bevelColor, setBevelColor] = useState("#ffff00");
+  // ベベル各セグメントの色（bevelSegments に同期）
+  const [bevelSegmentColors, setBevelSegmentColors] = useState<string[]>([
+    "#c70000",
+    "#000000",
+    "#ff9500",
+  ]);
   const [selectedFont, setSelectedFont] = useState(
     "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json"
   );
 
   // Material Effects
   const [metalness, setMetalness] = useState(1.0);
-  const [roughness, setRoughness] = useState(0.6);
-  const [emissive, setEmissive] = useState("#ffffff");
-  const [emissiveIntensity, setEmissiveIntensity] = useState(0);
-  const [selectedTexture, setSelectedTexture] = useState("none");
+  const [roughness, setRoughness] = useState(0.9);
+  
 
   // Lighting Controls
-  const [ambientIntensity, setAmbientIntensity] = useState(1.0);
-  const [mainLightIntensity, setMainLightIntensity] = useState(20.0);
-  const [sideLightIntensity, setSideLightIntensity] = useState(20.0);
+  // Lighting (Simple + Stable recipe)
+  const [ambientIntensity, setAmbientIntensity] = useState(3.0);
+  const [mainLightIntensity, setMainLightIntensity] = useState(9.0); // Key (front-left-up)
+  const [sideLightIntensity, setSideLightIntensity] = useState(3.0); // Fill (front-right-down)
 
   // Text3D Parameters
   const [size, setSize] = useState(1);
-  const [height, setHeight] = useState(1); // デフォルト1に変更
-  const [curveSegments, setCurveSegments] = useState(12);
   const [bevelEnabled, setBevelEnabled] = useState(true);
-  const [bevelThickness, setBevelThickness] = useState(0.1);
-  const [bevelSize, setBevelSize] = useState(0.1); // デフォルト0.1に変更
-  const [bevelOffset, setBevelOffset] = useState(0);
-  const [bevelSegments, setBevelSegments] = useState(5);
+  const [bevelThickness, setBevelThickness] = useState(0.5);
+  const [bevelSize, setBevelSize] = useState(0.2);
+  const [bevelSegments, setBevelSegments] = useState(3);
   const [letterSpacing, setLetterSpacing] = useState(1.0);
   const [isVertical, setIsVertical] = useState(false);
   const [isJsonOpen, setIsJsonOpen] = useState(false);
+  
 
   const fonts = [
     {
@@ -56,48 +61,60 @@ export default function Home() {
     },
   ];
 
-  const textures = [
-    { name: "None / なし", value: "none", path: null },
-    {
-      name: "Metal Plate / メタルプレート",
-      value: "metal",
-      path: "/textures/metal_plate_diff_1k.jpg",
-    },
-    {
-      name: "Metal Gloss / 金属光沢",
-      value: "gloss",
-      path: "/textures/pierre-bamin-_EzTds6Fo44-unsplash.jpg",
-    },
-  ];
+  
+
+  // 型定義
+  type PresetSettings = {
+    color: string;
+    bevelColor: string;
+    bevelSegmentColors?: string[];
+    selectedFont: string;
+    metalness: number;
+    roughness: number;
+    ambientIntensity: number;
+    mainLightIntensity: number;
+    sideLightIntensity: number;
+    size: number;
+    bevelEnabled: boolean;
+    bevelThickness: number;
+    bevelSize: number;
+    bevelSegments: number;
+    letterSpacing: number;
+    isVertical: boolean;
+  };
+  type Preset = {
+    name: string;
+    text: string;
+    image: string;
+    settings: PresetSettings;
+  };
 
   // プリセットスタイル
-  const presets = [
+  const presets: Preset[] = [
     {
       name: "ゴールド＆ゴシック",
       text: "全国最大級",
       image: "/images/sample-gothic.png",
       settings: {
-        color: "#FFD700",
-        bevelColor: "#8B4513",
+        color: "#ffff00",
+        bevelColor: "#ffff00",
+        bevelSegmentColors: ["#c70000", "#000000", "#ff9500"],
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json",
         metalness: 1,
-        roughness: 0.6,
-        emissive: "#ffffff",
-        emissiveIntensity: 0,
-        ambientIntensity: 1,
-        mainLightIntensity: 20,
-        sideLightIntensity: 20,
-        size: 1.0,
-        height: 1,
-        curveSegments: 12,
+        roughness: 0.9,
+        
+        ambientIntensity: 3,
+        mainLightIntensity: 9,
+        sideLightIntensity: 3,
+        size: 1,
         bevelEnabled: true,
-        bevelThickness: 0.1,
-        bevelSize: 0.1,
-        bevelOffset: 0,
-        bevelSegments: 5,
-        selectedTexture: "none",
-        letterSpacing: 1.0,
+        bevelThickness: 0.5,
+        bevelSize: 0.2,
+        bevelSegments: 3,
+        
+        letterSpacing: 1,
+        isVertical: false,
       },
     },
     {
@@ -105,55 +122,51 @@ export default function Home() {
       text: "新台入替",
       image: "/images/sample-mincho.png",
       settings: {
-        color: "#fff700",
-        bevelColor: "#6b00b3",
+        color: "#ffff00",
+        bevelColor: "#ffff00",
+        bevelSegmentColors: ["#ff6600", "#000000"],
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json",
-        metalness: 0.8,
-        roughness: 0.1,
-        emissive: "#ffffff",
-        emissiveIntensity: 0.1,
-        ambientIntensity: 2,
-        mainLightIntensity: 30,
-        sideLightIntensity: 25,
-        size: 1.0,
-        height: 2.1,
-        curveSegments: 16,
+        metalness: 0.2,
+        roughness: 1,
+        
+        ambientIntensity: 3,
+        mainLightIntensity: 3,
+        sideLightIntensity: 3,
+        size: 1,
         bevelEnabled: true,
-        bevelThickness: 0.19,
-        bevelSize: 0.06,
-        bevelOffset: 0.001,
-        bevelSegments: 8,
-        selectedTexture: "none",
-        letterSpacing: 1.0,
+        bevelThickness: 0.15,
+        bevelSize: 0.04,
+        bevelSegments: 2,
+        
+        letterSpacing: 0.6,
+        isVertical: false,
       },
     },
     {
-      name: "激熱！筆文字",
-      text: "激アツ!",
+      name: "激アツ！楷書",
+      text: "激アツ",
       image: "/images/sample-kaisho.png",
       settings: {
-        color: "#FF0000",
-        bevelColor: "#fbff24",
+        color: "#ff0000",
+        bevelColor: "#ff0000",
+        bevelSegmentColors: ["#ffea00", "#ffffff"],
         selectedFont:
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json",
-        metalness: 0.8,
-        roughness: 0.4,
-        emissive: "#ff0000",
-        emissiveIntensity: 0.34,
-        ambientIntensity: 1.5,
-        mainLightIntensity: 25,
-        sideLightIntensity: 15,
-        size: 1.0,
-        height: 0.7,
-        curveSegments: 9,
+        metalness: 0.7,
+        roughness: 0.5,
+        
+        ambientIntensity: 4,
+        mainLightIntensity: 3,
+        sideLightIntensity: 3,
+        size: 1,
         bevelEnabled: true,
-        bevelThickness: 0.214,
-        bevelSize: 0.1,
-        bevelOffset: -0.022,
-        bevelSegments: 7,
-        selectedTexture: "none",
-        letterSpacing: 1.0,
+        bevelThickness: 0.3,
+        bevelSize: 0.2,
+        bevelSegments: 2,
+        
+        letterSpacing: 1.1,
+        isVertical: false,
       },
     },
   ];
@@ -175,27 +188,28 @@ export default function Home() {
   }, []);
 
   // プリセットを適用する関数
-  const applyPreset = useCallback((preset: (typeof presets)[0]) => {
+  const applyPreset = useCallback((preset: Preset) => {
     // テキストは変更しない
     setColor(preset.settings.color);
     setBevelColor(preset.settings.bevelColor);
+    // ベベルセグメント色（プリセット未指定ならベース色で埋める）
+    const segCount = preset.settings.bevelSegments;
+    const segColors = preset.settings.bevelSegmentColors;
+    setBevelSegmentColors(
+      Array.from({ length: segCount }, (_, i) => (segColors?.[i] ?? preset.settings.bevelColor))
+    );
     setSelectedFont(preset.settings.selectedFont);
     setMetalness(preset.settings.metalness);
     setRoughness(preset.settings.roughness);
-    setEmissive(preset.settings.emissive);
-    setEmissiveIntensity(preset.settings.emissiveIntensity);
     setAmbientIntensity(preset.settings.ambientIntensity);
     setMainLightIntensity(preset.settings.mainLightIntensity);
     setSideLightIntensity(preset.settings.sideLightIntensity);
     setSize(preset.settings.size);
-    setHeight(preset.settings.height);
-    setCurveSegments(preset.settings.curveSegments);
     setBevelEnabled(preset.settings.bevelEnabled);
     setBevelThickness(preset.settings.bevelThickness);
     setBevelSize(preset.settings.bevelSize);
-    setBevelOffset(preset.settings.bevelOffset);
     setBevelSegments(preset.settings.bevelSegments);
-    setSelectedTexture(preset.settings.selectedTexture);
+    
     setLetterSpacing(preset.settings.letterSpacing);
   }, []);
 
@@ -205,40 +219,34 @@ export default function Home() {
       text,
       color,
       bevelColor,
+      bevelSegmentColors,
       fontPath,
       size,
-      height,
-      curveSegments,
+      
       bevelEnabled,
       bevelThickness,
       bevelSize,
-      bevelOffset,
       bevelSegments,
       metalness,
       roughness,
-      emissive,
-      emissiveIntensity,
-      selectedTexture,
+      
       letterSpacing,
       isVertical,
     }: {
       text: string;
       color: string;
       bevelColor: string;
+      bevelSegmentColors: string[];
       fontPath: string;
       size: number;
-      height: number;
-      curveSegments: number;
+      
       bevelEnabled: boolean;
       bevelThickness: number;
       bevelSize: number;
-      bevelOffset: number;
       bevelSegments: number;
       metalness: number;
       roughness: number;
-      emissive: string;
-      emissiveIntensity: number;
-      selectedTexture: string;
+      
       letterSpacing: number;
       isVertical: boolean;
     }) => {
@@ -248,34 +256,7 @@ export default function Home() {
       // フォントデータを読み込み（グリフ情報を取得するため）
       const font = useLoader(FontLoader, fontPath);
 
-      // テクスチャの読み込み（全テクスチャを事前に読み込み）
-      const selectedTextureInfo = textures.find(
-        (t) => t.value === selectedTexture
-      );
-      const texturePaths = [
-        "/textures/metal_plate_diff_1k.jpg",
-        "/textures/pierre-bamin-_EzTds6Fo44-unsplash.jpg",
-      ];
-
-      // 常に全テクスチャを読み込み（条件なし）
-      const textureArray = useTexture(texturePaths);
-      const loadedTextures: { [key: string]: THREE.Texture } = {};
-
-      texturePaths.forEach((path, index) => {
-        const tex = Array.isArray(textureArray)
-          ? textureArray[index]
-          : textureArray;
-        if (tex) {
-          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-          tex.repeat.set(2, 2);
-          loadedTextures[path] = tex;
-        }
-      });
-
-      // 選択されたテクスチャを取得
-      const texture = selectedTextureInfo?.path
-        ? loadedTextures[selectedTextureInfo.path]
-        : null;
+      
 
       // 縦書き・横書きの文字位置計算
       const charPositions: number[] = [];
@@ -314,61 +295,96 @@ export default function Home() {
       // 注意：半角英数字の回転は基準点の問題で一旦保留
 
       return (
-        <Center>
-          <group>
-            {characters.map((char, index) => {
-              const posX = isVertical ? 0 : charPositions[index] - centerOffset;
-              const posY = isVertical
-                ? -(charPositions[index] - centerOffset)
-                : 0;
+        <group>
+          {characters.map((char, index) => {
+            const posX = isVertical ? 0 : charPositions[index] - centerOffset;
+            const posY = isVertical
+              ? -(charPositions[index] - centerOffset)
+              : 0;
 
-              return (
-                <Text3D
-                  key={index}
-                  font={fontPath}
-                  size={size}
-                  height={height}
-                  curveSegments={curveSegments}
-                  bevelEnabled={bevelEnabled}
-                  bevelThickness={bevelThickness}
-                  bevelSize={bevelSize}
-                  bevelOffset={bevelOffset}
-                  bevelSegments={bevelSegments}
-                  position={[posX, posY, 0]}
-                >
-                  {char}
-                  {/* Try JSX approach for multi-material */}
-                  <meshStandardMaterial
-                    attach={(parent) => {
-                      // Create materials array and assign to parent
-                      const frontMaterial = new THREE.MeshStandardMaterial({
-                        color: new THREE.Color(color),
-                        metalness: metalness,
-                        roughness: roughness,
-                        emissive: new THREE.Color(emissive),
-                        emissiveIntensity: emissiveIntensity,
-                        map: texture, // テクスチャを適用
-                      });
-                      const sideMaterial = new THREE.MeshStandardMaterial({
-                        color: new THREE.Color(bevelColor),
-                        metalness: metalness * 1.2,
-                        roughness: roughness * 0.8,
-                        emissive: new THREE.Color(emissive),
-                        emissiveIntensity: emissiveIntensity * 0.5,
-                      });
-                      parent.material = [frontMaterial, sideMaterial];
-                      return () => {
-                        // Cleanup
-                        frontMaterial.dispose();
-                        sideMaterial.dispose();
-                      };
-                    }}
-                  />
-                </Text3D>
-              );
-            })}
-          </group>
-        </Center>
+            return (
+              <group key={`char-${index}`} position={[posX, posY, 0]}>
+                <Center>
+                  <Text3D
+                    font={fontPath}
+                    size={size}
+                    height={1.0}
+                    curveSegments={12}
+                    bevelEnabled={bevelEnabled}
+                    bevelThickness={bevelThickness}
+                    bevelSize={bevelSize}
+                    bevelSegments={bevelSegments}
+                    position={[0, 0, 0]}
+                  >
+                    {char}
+                    <meshStandardMaterial
+                      attach={(parent) => {
+                        // フェイスもPBRで表現（キー正面＋フィルで色の再現性を確保）
+                        const frontMaterial = new THREE.MeshStandardMaterial({
+                          color: new THREE.Color(color),
+                          metalness: metalness,
+                          roughness: roughness,
+                        });
+                        const sideMaterial = new THREE.MeshStandardMaterial({
+                          color: new THREE.Color(bevelColor),
+                          metalness: metalness * 1.2,
+                          roughness: roughness * 0.8,
+                        });
+
+                        // シェーダ拡張: ベベル領域をセグメント毎に色分け
+                        if (bevelEnabled) sideMaterial.onBeforeCompile = (shader) => {
+                          // uniforms
+                          shader.uniforms.uDepth = { value: 1.0 };
+                          shader.uniforms.uBevelThickness = { value: bevelThickness };
+                          shader.uniforms.uBevelSegments = { value: bevelSegments };
+                          const colors = bevelSegmentColors.map((hex) => new THREE.Color(hex));
+                          // 最大10色まで
+                          const MAX = 10;
+                          const padded = Array.from({ length: MAX }, (_, i) => colors[i] ?? new THREE.Color(bevelColor));
+                          shader.uniforms.uColors = { value: padded };
+
+                          // vertex: local position/normal を伝搬
+                          shader.vertexShader = shader.vertexShader
+                            .replace(
+                              '#include <common>',
+                              `#include <common>\n varying vec3 vPos;\n varying vec3 vNrm;`
+                            )
+                            .replace(
+                              '#include <begin_vertex>',
+                              `#include <begin_vertex>\n vPos = position;\n vNrm = normalize(normal);`
+                            );
+
+                          // fragment: ベベル近傍を検出しセグメント別に色指定（法線のZ成分でベベル角度を推定）
+                          shader.fragmentShader = shader.fragmentShader
+                            .replace(
+                              '#include <common>',
+                              `#include <common>\n varying vec3 vPos;\n varying vec3 vNrm;\n uniform float uDepth;\n uniform float uBevelThickness;\n uniform int uBevelSegments;\n uniform vec3 uColors[10];`
+                            )
+                            .replace(
+                              'vec4 diffuseColor = vec4( diffuse, opacity );',
+                              `vec4 diffuseColor = vec4( diffuse, opacity );\n\n // 法線のZ成分からベベル角度を近似（±Z=面、0=側面、途中=ベベル）\n float nz = abs(vNrm.z);\n if (uBevelSegments > 0 && nz > 0.05 && nz < 0.95) {\n   float t = 1.0 - nz; // 0:面に近い, 1:側面に近い\n   float segF = floor(t * float(uBevelSegments));\n   int seg = int(clamp(segF, 0.0, float(uBevelSegments - 1)));\n   vec3 segColor = uColors[seg];\n   diffuseColor.rgb = segColor;\n }`
+                            );
+
+                          type MaterialWithShader = THREE.MeshStandardMaterial & {
+                            userData: { shader?: unknown };
+                          };
+                          const mat = sideMaterial as MaterialWithShader;
+                          mat.userData.shader = shader;
+                        };
+
+                        parent.material = [frontMaterial, sideMaterial];
+                        return () => {
+                          frontMaterial.dispose();
+                          sideMaterial.dispose();
+                        };
+                      }}
+                    />
+                  </Text3D>
+                </Center>
+              </group>
+            );
+          })}
+        </group>
       );
     }
   );
@@ -424,7 +440,7 @@ export default function Home() {
       />
       <div className="min-h-screen bg-white text-gray-900">
         <div className="container mx-auto p-8">
-          <div className="mb-8">
+          <div className="mb-8 flex items-center justify-between">
             <Image
               src="/images/logo.png"
               alt="パチ文字メーカー"
@@ -432,6 +448,29 @@ export default function Home() {
               height={48}
               className="h-12 w-auto"
             />
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              title="ダウンロード"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                className="w-5 h-5"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v1.125A2.625 2.625 0 005.625 20.25h12.75A2.625 2.625 0 0021 17.625V16.5M7.5 9l4.5 4.5L16.5 9M12 3v10.5"
+                />
+              </svg>
+              ダウンロード
+            </button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -449,39 +488,36 @@ export default function Home() {
                 {/* シンプルな3灯ライティング */}
                 <ambientLight intensity={ambientIntensity} color="#ffffff" />
 
-                {/* メインライト（正面上から） */}
+                {/* Key light: further front-left-up */}
                 <directionalLight
-                  position={[0, 10, 5]}
+                  position={[-6, 4, 8]}
                   intensity={mainLightIntensity}
                   color="#ffffff"
                   castShadow
                 />
 
-                {/* サイドライト（右から） */}
+                {/* Fill light: further front-right-down */}
                 <directionalLight
-                  position={[5, 3, 0]}
+                  position={[6, -3, 6]}
                   intensity={sideLightIntensity}
-                  color="#ffff99"
+                  color="#ffffff"
                 />
+
+                
 
                 <Text3DContent
                   text={text}
                   color={color}
                   bevelColor={bevelColor}
+                  bevelSegmentColors={bevelSegmentColors}
                   fontPath={selectedFont}
                   size={size}
-                  height={height}
-                  curveSegments={curveSegments}
                   bevelEnabled={bevelEnabled}
                   bevelThickness={bevelThickness}
                   bevelSize={bevelSize}
-                  bevelOffset={bevelOffset}
                   bevelSegments={bevelSegments}
                   metalness={metalness}
                   roughness={roughness}
-                  emissive={emissive}
-                  emissiveIntensity={emissiveIntensity}
-                  selectedTexture={selectedTexture}
                   letterSpacing={letterSpacing}
                   isVertical={isVertical}
                 />
@@ -506,13 +542,7 @@ export default function Home() {
                 />
               </div>
 
-              <button
-                type="button"
-                onClick={handleDownload}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-full"
-              >
-                画像ダウンロード（透過PNG）
-              </button>
+              {/* ダウンロードボタンはヘッダー右上へ移動 */}
 
               <div>
                 <label
@@ -573,7 +603,7 @@ export default function Home() {
                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                   >
-                    縦書き（β）
+                    縦書き (β)
                   </button>
                 </div>
               </div>
@@ -583,7 +613,7 @@ export default function Home() {
                   htmlFor="color-input"
                   className="block mb-2 text-sm font-medium"
                 >
-                  表面色 / Face Color
+                  文字の色 / Face Color
                 </label>
                 <input
                   id="color-input"
@@ -594,15 +624,32 @@ export default function Home() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <div className="block mb-2 text-sm font-medium">
+                  縁取りの色 (β) / Bevel Segment Colors
+                </div>
+                {Array.from({ length: bevelSegments }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="text-xs w-28">縁取り（層{i + 1}）</span>
+                    <input
+                      type="color"
+                      value={bevelSegmentColors[i] ?? bevelColor}
+                      onChange={(e) => {
+                        const next = [...bevelSegmentColors];
+                        next[i] = e.target.value;
+                        setBevelSegmentColors(next);
+                      }}
+                      className="h-8 w-14 bg-white border border-gray-300 rounded cursor-pointer"
+                    />
+                  </div>
+                ))}
+              </div>
+
               <div>
-                <label
-                  htmlFor="bevel-color-input"
-                  className="block mb-2 text-sm font-medium"
-                >
-                  ベベル色 / Bevel Color
+                <label className="block mb-2 text-sm font-medium">
+                  側面の色 / Side Color
                 </label>
                 <input
-                  id="bevel-color-input"
                   type="color"
                   value={bevelColor}
                   onChange={(e) => setBevelColor(e.target.value)}
@@ -610,75 +657,19 @@ export default function Home() {
                 />
               </div>
 
-              {/* 3D Parameters */}
+              {/* Bevel Parameters */}
               <div className="space-y-4 border-t pt-4">
-                <h3 className="font-medium">3D設定 / 3D Parameters</h3>
+                <h3 className="font-medium">縁取りの設定 / Bevel Parameters</h3>
+
+                
+
+                
+
+                {/* height と curveSegments は固定化（height=1.0, curveSegments=12）*/}
 
                 <div>
                   <label className="block mb-1 text-sm">
-                    サイズ / Size: {size.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="3"
-                    step="0.1"
-                    value={size}
-                    onChange={(e) => setSize(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    高さ（奥行き） / Height (Depth): {height.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    value={height}
-                    onChange={(e) => setHeight(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    カーブ分割数 / Curve Segments: {curveSegments}
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="20"
-                    step="1"
-                    value={curveSegments}
-                    onChange={(e) => setCurveSegments(parseInt(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    ベベル厚さ / Bevel Thickness: {bevelThickness.toFixed(3)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.001"
-                    value={bevelThickness}
-                    onChange={(e) =>
-                      setBevelThickness(parseFloat(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    ベベルサイズ / Bevel Size: {bevelSize.toFixed(2)}
+                    縁取りの大きさ / Bevel Size: {bevelSize.toFixed(2)}
                   </label>
                   <input
                     type="range"
@@ -693,22 +684,7 @@ export default function Home() {
 
                 <div>
                   <label className="block mb-1 text-sm">
-                    ベベルオフセット / Bevel Offset: {bevelOffset.toFixed(3)}
-                  </label>
-                  <input
-                    type="range"
-                    min="-0.1"
-                    max="0.1"
-                    step="0.001"
-                    value={bevelOffset}
-                    onChange={(e) => setBevelOffset(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    ベベル分割数 / Bevel Segments: {bevelSegments}
+                    縁取りの層 / Bevel Segments: {bevelSegments}
                   </label>
                   <input
                     type="range"
@@ -716,10 +692,94 @@ export default function Home() {
                     max="10"
                     step="1"
                     value={bevelSegments}
-                    onChange={(e) => setBevelSegments(parseInt(e.target.value))}
+                    onChange={(e) => {
+                      const n = parseInt(e.target.value);
+                      setBevelSegments(n);
+                      setBevelSegmentColors((prev) => {
+                        const next = Array.from({ length: n }, (_, i) => prev[i] ?? bevelColor);
+                        return next;
+                      });
+                    }}
                     className="w-full"
                   />
                 </div>
+
+                <div>
+                  <label className="block mb-1 text-sm">
+                    縁取りの厚さ / Bevel Thickness: {bevelThickness.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={bevelThickness}
+                    onChange={(e) =>
+                      setBevelThickness(parseFloat(e.target.value))
+                    }
+                    className="w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Lighting Controls */}
+              <div className="space-y-4 border-t pt-4">
+                <h3 className="font-medium">
+                  ライティング制御 / Lighting Controls
+                </h3>
+
+                <div>
+                  <label className="block mb-1 text-sm">
+                    環境光 / Ambient Light: {ambientIntensity.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={ambientIntensity}
+                    onChange={(e) =>
+                      setAmbientIntensity(parseFloat(e.target.value))
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-1 text-sm">
+                    メインライト（キー） / Key: {mainLightIntensity.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={mainLightIntensity}
+                    onChange={(e) =>
+                      setMainLightIntensity(parseFloat(e.target.value))
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-1 text-sm">
+                    フィルライト / Fill: {sideLightIntensity.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={sideLightIntensity}
+                    onChange={(e) =>
+                      setSideLightIntensity(parseFloat(e.target.value))
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                
               </div>
 
               {/* Material Effects */}
@@ -758,118 +818,7 @@ export default function Home() {
                   />
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="emissive-color"
-                    className="block mb-2 text-sm"
-                  >
-                    発光色 / Emissive Color
-                  </label>
-                  <input
-                    id="emissive-color"
-                    type="color"
-                    value={emissive}
-                    onChange={(e) => setEmissive(e.target.value)}
-                    className="w-full h-8 bg-white border border-gray-300 rounded-lg cursor-pointer"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    発光強度 / Emissive Intensity:{" "}
-                    {emissiveIntensity.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="2"
-                    step="0.01"
-                    value={emissiveIntensity}
-                    onChange={(e) =>
-                      setEmissiveIntensity(parseFloat(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="texture-select"
-                    className="block mb-2 text-sm font-medium"
-                  >
-                    テクスチャ / Texture
-                  </label>
-                  <select
-                    id="texture-select"
-                    value={selectedTexture}
-                    onChange={(e) => setSelectedTexture(e.target.value)}
-                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-900"
-                  >
-                    {textures.map((texture) => (
-                      <option key={texture.value} value={texture.value}>
-                        {texture.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Lighting Controls */}
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="font-medium">
-                  ライティング制御 / Lighting Controls
-                </h3>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    環境光 / Ambient Light: {ambientIntensity.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    value={ambientIntensity}
-                    onChange={(e) =>
-                      setAmbientIntensity(parseFloat(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    メインライト / Main Light: {mainLightIntensity.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="50"
-                    step="0.1"
-                    value={mainLightIntensity}
-                    onChange={(e) =>
-                      setMainLightIntensity(parseFloat(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    サイドライト / Side Light: {sideLightIntensity.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="30"
-                    step="0.1"
-                    value={sideLightIntensity}
-                    onChange={(e) =>
-                      setSideLightIntensity(parseFloat(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
+                
               </div>
 
               {/* JSON Settings */}
@@ -891,23 +840,18 @@ export default function Home() {
                         text,
                         color,
                         bevelColor,
+                        bevelSegmentColors,
                         selectedFont,
                         metalness,
                         roughness,
-                        emissive,
-                        emissiveIntensity,
                         ambientIntensity,
                         mainLightIntensity,
                         sideLightIntensity,
                         size,
-                        height,
-                        curveSegments,
                         bevelEnabled,
                         bevelThickness,
                         bevelSize,
-                        bevelOffset,
                         bevelSegments,
-                        selectedTexture,
                         letterSpacing,
                         isVertical,
                       },
@@ -924,43 +868,37 @@ export default function Home() {
                           setColor(settings.color);
                         if (settings.bevelColor !== undefined)
                           setBevelColor(settings.bevelColor);
+                        if (settings.bevelSegmentColors !== undefined && Array.isArray(settings.bevelSegmentColors))
+                          setBevelSegmentColors(settings.bevelSegmentColors);
                         if (settings.selectedFont !== undefined)
                           setSelectedFont(settings.selectedFont);
                         if (settings.metalness !== undefined)
                           setMetalness(settings.metalness);
                         if (settings.roughness !== undefined)
                           setRoughness(settings.roughness);
-                        if (settings.emissive !== undefined)
-                          setEmissive(settings.emissive);
-                        if (settings.emissiveIntensity !== undefined)
-                          setEmissiveIntensity(settings.emissiveIntensity);
+                        
                         if (settings.ambientIntensity !== undefined)
                           setAmbientIntensity(settings.ambientIntensity);
                         if (settings.mainLightIntensity !== undefined)
                           setMainLightIntensity(settings.mainLightIntensity);
                         if (settings.sideLightIntensity !== undefined)
                           setSideLightIntensity(settings.sideLightIntensity);
+                        
                         if (settings.size !== undefined) setSize(settings.size);
-                        if (settings.height !== undefined)
-                          setHeight(settings.height);
-                        if (settings.curveSegments !== undefined)
-                          setCurveSegments(settings.curveSegments);
                         if (settings.bevelEnabled !== undefined)
                           setBevelEnabled(settings.bevelEnabled);
                         if (settings.bevelThickness !== undefined)
                           setBevelThickness(settings.bevelThickness);
                         if (settings.bevelSize !== undefined)
                           setBevelSize(settings.bevelSize);
-                        if (settings.bevelOffset !== undefined)
-                          setBevelOffset(settings.bevelOffset);
                         if (settings.bevelSegments !== undefined)
                           setBevelSegments(settings.bevelSegments);
-                        if (settings.selectedTexture !== undefined)
-                          setSelectedTexture(settings.selectedTexture);
+                        
                         if (settings.letterSpacing !== undefined)
                           setLetterSpacing(settings.letterSpacing);
                         if (settings.isVertical !== undefined)
                           setIsVertical(settings.isVertical);
+                        
                       } catch {
                         // Invalid JSON - ignore
                       }
