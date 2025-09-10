@@ -117,7 +117,7 @@ export default function Home() {
       },
     },
     {
-      name: "激熱！筆文字",
+      name: "激アツ！楷書",
       text: "激アツ",
       image: "/images/sample-kaisho.png",
       settings: {
@@ -572,7 +572,7 @@ export default function Home() {
                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                   >
-                    縦書き（β）
+                    縦書き (β)
                   </button>
                 </div>
               </div>
@@ -595,7 +595,7 @@ export default function Home() {
 
               <div className="space-y-2">
                 <div className="block mb-2 text-sm font-medium">
-                  縁取りの色（層ごと） / Bevel Segment Colors
+                  縁取りの色 (β) / Bevel Segment Colors
                 </div>
                 {Array.from({ length: bevelSegments }).map((_, i) => (
                   <div key={i} className="flex items-center gap-2">
