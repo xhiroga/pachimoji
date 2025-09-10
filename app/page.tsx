@@ -37,7 +37,6 @@ export default function Home() {
   const [bevelEnabled, setBevelEnabled] = useState(true);
   const [bevelThickness, setBevelThickness] = useState(0.1);
   const [bevelSize, setBevelSize] = useState(0.1); // デフォルト0.1に変更
-  const [bevelOffset, setBevelOffset] = useState(0);
   const [bevelSegments, setBevelSegments] = useState(5);
   const [letterSpacing, setLetterSpacing] = useState(1.0);
   const [isVertical, setIsVertical] = useState(false);
@@ -82,7 +81,6 @@ export default function Home() {
         bevelEnabled: true,
         bevelThickness: 0.1,
         bevelSize: 0.1,
-        bevelOffset: 0,
         bevelSegments: 5,
         
         letterSpacing: 1.0,
@@ -107,7 +105,6 @@ export default function Home() {
         bevelEnabled: true,
         bevelThickness: 0.19,
         bevelSize: 0.06,
-        bevelOffset: 0.001,
         bevelSegments: 8,
         
         letterSpacing: 1.0,
@@ -132,7 +129,6 @@ export default function Home() {
         bevelEnabled: true,
         bevelThickness: 0.214,
         bevelSize: 0.1,
-        bevelOffset: -0.022,
         bevelSegments: 7,
         
         letterSpacing: 1.0,
@@ -177,7 +173,6 @@ export default function Home() {
     setBevelEnabled(preset.settings.bevelEnabled);
     setBevelThickness(preset.settings.bevelThickness);
     setBevelSize(preset.settings.bevelSize);
-    setBevelOffset(preset.settings.bevelOffset);
     setBevelSegments(preset.settings.bevelSegments);
     
     setLetterSpacing(preset.settings.letterSpacing);
@@ -196,7 +191,6 @@ export default function Home() {
       bevelEnabled,
       bevelThickness,
       bevelSize,
-      bevelOffset,
       bevelSegments,
       metalness,
       roughness,
@@ -214,7 +208,6 @@ export default function Home() {
       bevelEnabled: boolean;
       bevelThickness: number;
       bevelSize: number;
-      bevelOffset: number;
       bevelSegments: number;
       metalness: number;
       roughness: number;
@@ -285,7 +278,6 @@ export default function Home() {
                     bevelEnabled={bevelEnabled}
                     bevelThickness={bevelThickness}
                     bevelSize={bevelSize}
-                    bevelOffset={bevelOffset}
                     bevelSegments={bevelSegments}
                     position={[0, 0, 0]}
                   >
@@ -484,7 +476,6 @@ export default function Home() {
                   bevelEnabled={bevelEnabled}
                   bevelThickness={bevelThickness}
                   bevelSize={bevelSize}
-                  bevelOffset={bevelOffset}
                   bevelSegments={bevelSegments}
                   metalness={metalness}
                   roughness={roughness}
@@ -627,9 +618,9 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* 3D Parameters */}
+              {/* Bevel Parameters */}
               <div className="space-y-4 border-t pt-4">
-                <h3 className="font-medium">3D設定 / 3D Parameters</h3>
+                <h3 className="font-medium">縁取りの設定 / Bevel Parameters</h3>
 
                 
 
@@ -639,24 +630,7 @@ export default function Home() {
 
                 <div>
                   <label className="block mb-1 text-sm">
-                    ベベル厚さ / Bevel Thickness: {bevelThickness.toFixed(3)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.001"
-                    value={bevelThickness}
-                    onChange={(e) =>
-                      setBevelThickness(parseFloat(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    ベベルサイズ / Bevel Size: {bevelSize.toFixed(2)}
+                    縁取りの大きさ / Bevel Size: {bevelSize.toFixed(2)}
                   </label>
                   <input
                     type="range"
@@ -671,22 +645,7 @@ export default function Home() {
 
                 <div>
                   <label className="block mb-1 text-sm">
-                    ベベルオフセット / Bevel Offset: {bevelOffset.toFixed(3)}
-                  </label>
-                  <input
-                    type="range"
-                    min="-0.1"
-                    max="0.1"
-                    step="0.001"
-                    value={bevelOffset}
-                    onChange={(e) => setBevelOffset(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    ベベル分割数 / Bevel Segments: {bevelSegments}
+                    縁取りの層 / Bevel Segments: {bevelSegments}
                   </label>
                   <input
                     type="range"
@@ -702,6 +661,23 @@ export default function Home() {
                         return next;
                       });
                     }}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-1 text-sm">
+                    縁取りの厚さ / Bevel Thickness: {bevelThickness.toFixed(3)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.001"
+                    value={bevelThickness}
+                    onChange={(e) =>
+                      setBevelThickness(parseFloat(e.target.value))
+                    }
                     className="w-full"
                   />
                 </div>
@@ -836,7 +812,6 @@ export default function Home() {
                         bevelEnabled,
                         bevelThickness,
                         bevelSize,
-                        bevelOffset,
                         bevelSegments,
                         letterSpacing,
                         isVertical,
@@ -877,8 +852,6 @@ export default function Home() {
                           setBevelThickness(settings.bevelThickness);
                         if (settings.bevelSize !== undefined)
                           setBevelSize(settings.bevelSize);
-                        if (settings.bevelOffset !== undefined)
-                          setBevelOffset(settings.bevelOffset);
                         if (settings.bevelSegments !== undefined)
                           setBevelSegments(settings.bevelSegments);
                         
