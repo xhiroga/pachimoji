@@ -119,7 +119,7 @@ export default function Home() {
     },
     {
       name: "高級感＆明朝",
-      text: "新台入荷",
+      text: "新台入替",
       image: "/images/sample-mincho.png",
       settings: {
         color: "#ffff00",
