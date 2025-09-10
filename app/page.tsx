@@ -15,7 +15,7 @@ export default function Home() {
   const [bevelColor, setBevelColor] = useState("#8B4513");
   // ベベル各セグメントの色（bevelSegments に同期）
   const [bevelSegmentColors, setBevelSegmentColors] = useState<string[]>(
-    Array.from({ length: 5 }, () => "#8B4513")
+    Array.from({ length: 3 }, () => "#8B4513")
   );
   const [selectedFont, setSelectedFont] = useState(
     "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json"
@@ -35,9 +35,9 @@ export default function Home() {
   // Text3D Parameters
   const [size, setSize] = useState(1);
   const [bevelEnabled, setBevelEnabled] = useState(true);
-  const [bevelThickness, setBevelThickness] = useState(0.1);
-  const [bevelSize, setBevelSize] = useState(0.1); // デフォルト0.1に変更
-  const [bevelSegments, setBevelSegments] = useState(5);
+  const [bevelThickness, setBevelThickness] = useState(0.5);
+  const [bevelSize, setBevelSize] = useState(0.15);
+  const [bevelSegments, setBevelSegments] = useState(3);
   const [letterSpacing, setLetterSpacing] = useState(1.0);
   const [isVertical, setIsVertical] = useState(false);
   const [isJsonOpen, setIsJsonOpen] = useState(false);
@@ -574,7 +574,7 @@ export default function Home() {
                   htmlFor="color-input"
                   className="block mb-2 text-sm font-medium"
                 >
-                  表面色 / Face Color
+                  文字の色 / Face Color
                 </label>
                 <input
                   id="color-input"
@@ -585,25 +585,13 @@ export default function Home() {
                 />
               </div>
 
-              <div>
-                <label className="block mb-2 text-sm font-medium">
-                  側面・ベース色 / Side Base Color
-                </label>
-                <input
-                  type="color"
-                  value={bevelColor}
-                  onChange={(e) => setBevelColor(e.target.value)}
-                  className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
-                />
-              </div>
-
               <div className="space-y-2">
                 <div className="block mb-2 text-sm font-medium">
-                  ベベル色（セグメントごと） / Bevel Segment Colors
+                  縁取りの色（層ごと） / Bevel Segment Colors
                 </div>
                 {Array.from({ length: bevelSegments }).map((_, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="text-xs w-20">Segment {i + 1}</span>
+                    <span className="text-xs w-28">縁取り（層{i + 1}）</span>
                     <input
                       type="color"
                       value={bevelSegmentColors[i] ?? bevelColor}
@@ -616,6 +604,18 @@ export default function Home() {
                     />
                   </div>
                 ))}
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium">
+                  側面の色 / Side Color
+                </label>
+                <input
+                  type="color"
+                  value={bevelColor}
+                  onChange={(e) => setBevelColor(e.target.value)}
+                  className="w-full h-10 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                />
               </div>
 
               {/* Bevel Parameters */}
@@ -667,13 +667,13 @@ export default function Home() {
 
                 <div>
                   <label className="block mb-1 text-sm">
-                    縁取りの厚さ / Bevel Thickness: {bevelThickness.toFixed(3)}
+                    縁取りの厚さ / Bevel Thickness: {bevelThickness.toFixed(2)}
                   </label>
                   <input
                     type="range"
                     min="0"
                     max="1"
-                    step="0.001"
+                    step="0.01"
                     value={bevelThickness}
                     onChange={(e) =>
                       setBevelThickness(parseFloat(e.target.value))
@@ -681,45 +681,6 @@ export default function Home() {
                     className="w-full"
                   />
                 </div>
-              </div>
-
-              {/* Material Effects */}
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="font-medium">
-                  マテリアル効果 / Material Effects
-                </h3>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    メタリック / Metalness: {metalness.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={metalness}
-                    onChange={(e) => setMetalness(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-sm">
-                    粗さ / Roughness: {roughness.toFixed(2)}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={roughness}
-                    onChange={(e) => setRoughness(parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-
-                
               </div>
 
               {/* Lighting Controls */}
@@ -775,6 +736,45 @@ export default function Home() {
                     onChange={(e) =>
                       setSideLightIntensity(parseFloat(e.target.value))
                     }
+                    className="w-full"
+                  />
+                </div>
+
+                
+              </div>
+
+              {/* Material Effects */}
+              <div className="space-y-4 border-t pt-4">
+                <h3 className="font-medium">
+                  マテリアル効果 / Material Effects
+                </h3>
+
+                <div>
+                  <label className="block mb-1 text-sm">
+                    メタリック / Metalness: {metalness.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={metalness}
+                    onChange={(e) => setMetalness(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-1 text-sm">
+                    粗さ / Roughness: {roughness.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={roughness}
+                    onChange={(e) => setRoughness(parseFloat(e.target.value))}
                     className="w-full"
                   />
                 </div>
