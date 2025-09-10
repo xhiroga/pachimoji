@@ -7,6 +7,7 @@ import { Text3D, Center, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { sendGAEvent } from "@/utils/analytics";
+// Shader type is internal to three; avoid importing and use unknown where needed.
 
 export default function Home() {
   const [text, setText] = useState("全国最大級");
@@ -62,8 +63,34 @@ export default function Home() {
 
   
 
+  // 型定義
+  type PresetSettings = {
+    color: string;
+    bevelColor: string;
+    bevelSegmentColors?: string[];
+    selectedFont: string;
+    metalness: number;
+    roughness: number;
+    ambientIntensity: number;
+    mainLightIntensity: number;
+    sideLightIntensity: number;
+    size: number;
+    bevelEnabled: boolean;
+    bevelThickness: number;
+    bevelSize: number;
+    bevelSegments: number;
+    letterSpacing: number;
+    isVertical: boolean;
+  };
+  type Preset = {
+    name: string;
+    text: string;
+    image: string;
+    settings: PresetSettings;
+  };
+
   // プリセットスタイル
-  const presets = [
+  const presets: Preset[] = [
     {
       name: "ゴールド＆ゴシック",
       text: "全国最大級",
@@ -161,13 +188,13 @@ export default function Home() {
   }, []);
 
   // プリセットを適用する関数
-  const applyPreset = useCallback((preset: (typeof presets)[0]) => {
+  const applyPreset = useCallback((preset: Preset) => {
     // テキストは変更しない
     setColor(preset.settings.color);
     setBevelColor(preset.settings.bevelColor);
     // ベベルセグメント色（プリセット未指定ならベース色で埋める）
     const segCount = preset.settings.bevelSegments;
-    const segColors = (preset.settings as any).bevelSegmentColors as string[] | undefined;
+    const segColors = preset.settings.bevelSegmentColors;
     setBevelSegmentColors(
       Array.from({ length: segCount }, (_, i) => (segColors?.[i] ?? preset.settings.bevelColor))
     );
@@ -338,7 +365,11 @@ export default function Home() {
                               `vec4 diffuseColor = vec4( diffuse, opacity );\n\n // 法線のZ成分からベベル角度を近似（±Z=面、0=側面、途中=ベベル）\n float nz = abs(vNrm.z);\n if (uBevelSegments > 0 && nz > 0.05 && nz < 0.95) {\n   float t = 1.0 - nz; // 0:面に近い, 1:側面に近い\n   float segF = floor(t * float(uBevelSegments));\n   int seg = int(clamp(segF, 0.0, float(uBevelSegments - 1)));\n   vec3 segColor = uColors[seg];\n   diffuseColor.rgb = segColor;\n }`
                             );
 
-                          (sideMaterial as any).userData.shader = shader;
+                          type MaterialWithShader = THREE.MeshStandardMaterial & {
+                            userData: { shader?: unknown };
+                          };
+                          const mat = sideMaterial as MaterialWithShader;
+                          mat.userData.shader = shader;
                         };
 
                         parent.material = [frontMaterial, sideMaterial];
