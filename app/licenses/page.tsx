@@ -6,7 +6,7 @@ export default function LicensesPage() {
       <h1 className="text-3xl font-bold mb-6">ライセンス / Licenses</h1>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-2">生成物（ユーザー作成画像）の取扱い</h2>
+        <h2 className="text-xl font-semibold mb-2">作成した画像の取扱い</h2>
         <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
           <p>
             本サービスで利用者が作成した画像に関する著作権は、利用者に帰属します。
@@ -97,6 +97,18 @@ export default function LicensesPage() {
             <span>）</span>
           </li>
         </ul>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-xl font-semibold mb-2">ソースコードのライセンス / Source Code License</h2>
+        <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
+          <p>
+            パチ文字メーカーはOSSです。ソースコードを<a href="https://github.com/xhiroga/pachimoji" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-900 font-medium">GitHub</a>で公開しています。誰でもパチ文字メーカーを自由に複製・改変・再配布することができます。
+          </p>
+          <p>
+            ソースコードの利用はAGPL3.0に従います。パチ文字メーカーのソースコードを含むサービスを公開する場合、そのサービスのソースコードも同様に公開される必要があります。
+          </p>
+        </div>
       </section>
 
       <div className="text-sm">
