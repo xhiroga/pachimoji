@@ -37,7 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.2",
     "eslint-config-prettier": "^10.1.8",
-    "playwright": "^1.54.1",
+    "playwright": "^1.55.1",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
