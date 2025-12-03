@@ -20,7 +20,7 @@
     "@react-three/drei": "^10.5.1",
     "@react-three/fiber": "^9.2.0",
     "@types/three": "^0.178.1",
-    "next": "15.4.7",
+    "next": "15.4.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "three": "^0.178.0",
