@@ -7,6 +7,7 @@ import { Text3D, Center, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { sendGAEvent } from "@/utils/analytics";
+import { getDistinctColor } from "@/utils/colors";
 // Shader type is internal to three; avoid importing and use unknown where needed.
 
 export default function Home() {
@@ -27,7 +28,7 @@ export default function Home() {
   // Material Effects
   const [metalness, setMetalness] = useState(1.0);
   const [roughness, setRoughness] = useState(0.9);
-  
+
 
   // Lighting Controls
   // Lighting (Simple + Stable recipe)
@@ -44,7 +45,7 @@ export default function Home() {
   const [letterSpacing, setLetterSpacing] = useState(1.0);
   const [isVertical, setIsVertical] = useState(false);
   const [isJsonOpen, setIsJsonOpen] = useState(false);
-  
+
 
   const fonts = [
     {
@@ -61,7 +62,7 @@ export default function Home() {
     },
   ];
 
-  
+
 
   // 型定義
   type PresetSettings = {
@@ -103,7 +104,7 @@ export default function Home() {
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Noto Sans JP Black_Regular.json",
         metalness: 1,
         roughness: 0.9,
-        
+
         ambientIntensity: 3,
         mainLightIntensity: 9,
         sideLightIntensity: 3,
@@ -112,7 +113,7 @@ export default function Home() {
         bevelThickness: 0.5,
         bevelSize: 0.2,
         bevelSegments: 3,
-        
+
         letterSpacing: 1,
         isVertical: false,
       },
@@ -129,7 +130,7 @@ export default function Home() {
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/SoukouMincho_Regular.json",
         metalness: 0.2,
         roughness: 1,
-        
+
         ambientIntensity: 3,
         mainLightIntensity: 3,
         sideLightIntensity: 3,
@@ -138,7 +139,7 @@ export default function Home() {
         bevelThickness: 0.15,
         bevelSize: 0.04,
         bevelSegments: 2,
-        
+
         letterSpacing: 0.6,
         isVertical: false,
       },
@@ -155,7 +156,7 @@ export default function Home() {
           "https://pub-01cc0be364304d1f99c8da9cc811ffc0.r2.dev/fonts/Tamanegi Kaisho Geki FreeVer 7_Regular.json",
         metalness: 0.7,
         roughness: 0.5,
-        
+
         ambientIntensity: 4,
         mainLightIntensity: 3,
         sideLightIntensity: 3,
@@ -164,7 +165,7 @@ export default function Home() {
         bevelThickness: 0.3,
         bevelSize: 0.2,
         bevelSegments: 2,
-        
+
         letterSpacing: 1.1,
         isVertical: false,
       },
@@ -209,7 +210,7 @@ export default function Home() {
     setBevelThickness(preset.settings.bevelThickness);
     setBevelSize(preset.settings.bevelSize);
     setBevelSegments(preset.settings.bevelSegments);
-    
+
     setLetterSpacing(preset.settings.letterSpacing);
   }, []);
 
@@ -222,14 +223,14 @@ export default function Home() {
       bevelSegmentColors,
       fontPath,
       size,
-      
+
       bevelEnabled,
       bevelThickness,
       bevelSize,
       bevelSegments,
       metalness,
       roughness,
-      
+
       letterSpacing,
       isVertical,
     }: {
@@ -239,14 +240,14 @@ export default function Home() {
       bevelSegmentColors: string[];
       fontPath: string;
       size: number;
-      
+
       bevelEnabled: boolean;
       bevelThickness: number;
       bevelSize: number;
       bevelSegments: number;
       metalness: number;
       roughness: number;
-      
+
       letterSpacing: number;
       isVertical: boolean;
     }) => {
@@ -256,7 +257,7 @@ export default function Home() {
       // フォントデータを読み込み（グリフ情報を取得するため）
       const font = useLoader(FontLoader, fontPath);
 
-      
+
 
       // 縦書き・横書きの文字位置計算
       const charPositions: number[] = [];
@@ -503,7 +504,7 @@ export default function Home() {
                   color="#ffffff"
                 />
 
-                
+
 
                 <Text3DContent
                   text={text}
@@ -587,21 +588,19 @@ export default function Home() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setIsVertical(false)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      !isVertical
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!isVertical
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
                   >
                     横書き
                   </button>
                   <button
                     onClick={() => setIsVertical(true)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isVertical
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isVertical
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
                   >
                     縦書き (β)
                   </button>
@@ -661,9 +660,9 @@ export default function Home() {
               <div className="space-y-4 border-t pt-4">
                 <h3 className="font-medium">縁取りの設定 / Bevel Parameters</h3>
 
-                
 
-                
+
+
 
                 {/* height と curveSegments は固定化（height=1.0, curveSegments=12）*/}
 
@@ -696,7 +695,12 @@ export default function Home() {
                       const n = parseInt(e.target.value);
                       setBevelSegments(n);
                       setBevelSegmentColors((prev) => {
-                        const next = Array.from({ length: n }, (_, i) => prev[i] ?? bevelColor);
+                        const next = Array.from({ length: n }, (_, i) => {
+                          if (prev[i]) return prev[i];
+                          // 新しい層には、既存の色（文字色、側面色、他の層の色）と区別しやすい色を割り当てる
+                          const existingColors = [color, bevelColor, ...prev.filter(c => c !== undefined)];
+                          return getDistinctColor(existingColors);
+                        });
                         return next;
                       });
                     }}
@@ -779,7 +783,7 @@ export default function Home() {
                   />
                 </div>
 
-                
+
               </div>
 
               {/* Material Effects */}
@@ -818,7 +822,7 @@ export default function Home() {
                   />
                 </div>
 
-                
+
               </div>
 
               {/* JSON Settings */}
@@ -876,14 +880,14 @@ export default function Home() {
                           setMetalness(settings.metalness);
                         if (settings.roughness !== undefined)
                           setRoughness(settings.roughness);
-                        
+
                         if (settings.ambientIntensity !== undefined)
                           setAmbientIntensity(settings.ambientIntensity);
                         if (settings.mainLightIntensity !== undefined)
                           setMainLightIntensity(settings.mainLightIntensity);
                         if (settings.sideLightIntensity !== undefined)
                           setSideLightIntensity(settings.sideLightIntensity);
-                        
+
                         if (settings.size !== undefined) setSize(settings.size);
                         if (settings.bevelEnabled !== undefined)
                           setBevelEnabled(settings.bevelEnabled);
@@ -893,12 +897,12 @@ export default function Home() {
                           setBevelSize(settings.bevelSize);
                         if (settings.bevelSegments !== undefined)
                           setBevelSegments(settings.bevelSegments);
-                        
+
                         if (settings.letterSpacing !== undefined)
                           setLetterSpacing(settings.letterSpacing);
                         if (settings.isVertical !== undefined)
                           setIsVertical(settings.isVertical);
-                        
+
                       } catch {
                         // Invalid JSON - ignore
                       }
